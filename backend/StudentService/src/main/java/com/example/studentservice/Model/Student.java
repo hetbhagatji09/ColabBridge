@@ -63,4 +63,16 @@ public class Student {
     public void setDepartment(String department) {
         this.department = department;
     }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "s_id=" + s_id +
+                ", s_password='" + s_password + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", roll_no=" + roll_no +
+                ", department='" + department + '\'' +
+                '}';
+    }
 }
