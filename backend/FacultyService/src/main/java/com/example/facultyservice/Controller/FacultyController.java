@@ -14,7 +14,7 @@ public class FacultyController {
 
 
     @PostMapping("register")
-    public ResponseEntity<Faculty> register(@RequestBody Faculty faculty) {
-        return facultyService.addFaculty(faculty);
+    public ResponseEntity<Faculty> registerFaculty(@RequestBody Faculty faculty) {
+        return facultyService.registerFaculty(faculty);
     }
 }

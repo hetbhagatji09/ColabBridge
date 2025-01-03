@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class FacultyService {
     @Autowired
     private FacultyDao facultyDao;
-    public ResponseEntity<Faculty> addFaculty(Faculty faculty) {
+    public ResponseEntity<Faculty> registerFaculty(Faculty faculty) {
         try{
             return new ResponseEntity<>(facultyDao.save(faculty), HttpStatus.OK);
         }
