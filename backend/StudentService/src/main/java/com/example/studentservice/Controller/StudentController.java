@@ -16,7 +16,7 @@ public class StudentController {
     private StudentService studentService;
 
     @PostMapping("register")
-    public ResponseEntity<Student> registerFaculty(@RequestBody Student student) {
+    public ResponseEntity<Student> registerStudent(@RequestBody Student student) {
         return studentService.registerStudent(student);
     }
 
