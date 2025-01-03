@@ -7,15 +7,11 @@ import jakarta.persistence.Id;
 import lombok.*;
 
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
 public class Faculty {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int f_id;
+    private String f_password;
     private String name;
     private String email;
     private String department;
@@ -44,6 +40,7 @@ public class Faculty {
         this.email = email;
     }
 
+
     public String getDepartment() {
         return department;
     }
@@ -52,4 +49,11 @@ public class Faculty {
         this.department = department;
     }
 
+    public String getF_password() {
+        return f_password;
+    }
+
+    public void setF_password(String f_password) {
+        this.f_password = f_password;
+    }
 }
