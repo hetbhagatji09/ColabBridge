@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.*;
 public class ProjectController {
     @Autowired
     private ProjectService projectService;
-    @PostMapping("/project")
-    public ResponseEntity<Project> addProject(@RequestBody Project project) {
-        return projectService.addProject(project);
+    @PostMapping("project")
+    public ResponseEntity<Project> createProject(@RequestBody Project project) {
+        System.out.println("Hello ProjectController");
+        return projectService.createProject(project);
     }
 }

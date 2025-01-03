@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class ProjectService {
     @Autowired
     private ProjectDao projectDao;
-    public ResponseEntity<Project> addProject(Project project) {
+    public ResponseEntity<Project> createProject(Project project) {
         try {
             return new ResponseEntity<>(projectDao.save(project), HttpStatus.OK);
         } catch (Exception e) {
