@@ -7,6 +7,7 @@ import com.example.adminservice.Service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("admin")
@@ -24,6 +25,10 @@ public class AdminController {
     @PostMapping("student/register")
     public ResponseEntity<Student> registerStudent(@RequestBody Student student) {
         return adminService.registerStudent(student);
+    }
+    @PostMapping("student/registerFile")
+    public ResponseEntity<String> registerFile(@RequestPart("file") MultipartFile file){
+        return adminService.registerFile(file);
     }
 
 }
