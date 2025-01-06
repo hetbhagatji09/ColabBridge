@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
@@ -30,7 +31,7 @@ public class StudentService {
             }
     }
 
-    public ResponseEntity<String> registerFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> registerFile(@RequestPart("file") MultipartFile file) {
         try (InputStream inputStream = file.getInputStream();
              Workbook workbook = new XSSFWorkbook(inputStream)) {
 

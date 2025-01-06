@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class AdminService {
@@ -29,6 +30,16 @@ public class AdminService {
         try{
             return new ResponseEntity<>(studentClient.registerStudent(student), HttpStatus.OK).getBody();
         } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<String> registerFile(MultipartFile file) {
+        try{
+            studentClient.registerFile(file);
+            return new ResponseEntity<>("Success", HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
