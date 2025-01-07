@@ -1,5 +1,4 @@
 package com.example.facultyservice.Model;
-
 import java.time.LocalDate;
 
 public class Project {
