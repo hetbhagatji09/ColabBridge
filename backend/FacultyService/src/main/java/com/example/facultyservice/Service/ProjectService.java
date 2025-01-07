@@ -1,7 +1,7 @@
-package com.example.projectservice.Service;
+package com.example.facultyservice.Service;
 
-import com.example.projectservice.Dao.ProjectDao;
-import com.example.projectservice.Model.Project;
+import com.example.facultyservice.Dao.ProjectDao;
+import com.example.facultyservice.Model.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,4 +28,8 @@ public class ProjectService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+//    public ResponseEntity<List<Project>> getAllProjectsByFacultyId(int fId) {
+//
+//    }
 }

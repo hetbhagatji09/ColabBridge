@@ -1,12 +1,22 @@
 package com.example.facultyservice.Model;
+
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 
+@Entity
 public class Project {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int p_id;
     private String title;
     private String description;
     private String status;
     private LocalDate date;
+    @Column(name = "faculty_id")
+    private int ff_id;
+
 
     public int getP_id() {
         return p_id;
@@ -47,15 +57,17 @@ public class Project {
     public void setDate(LocalDate date) {
         this.date = date;
     }
-    public Project() {
-        this.date=LocalDate.now();
-    }
+
 
     public Project(int p_id, String title, String description, String status, LocalDate date) {
         this.p_id = p_id;
         this.title = title;
         this.description = description;
         this.status = status;
-        this.date = date;
+        this.date = LocalDate.now();
+    }
+
+    public Project() {
+        this.date=LocalDate.now();
     }
 }
