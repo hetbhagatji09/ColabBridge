@@ -3,6 +3,8 @@ package com.example.facultyservice.Model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Project {
@@ -14,8 +16,18 @@ public class Project {
     private String description;
     private String status;
     private LocalDate date;
-    @Column(name = "faculty_id")
-    private int ff_id;
+    @ManyToOne
+    @JoinColumn(name = "facultyId")
+    private Faculty faculty;
+
+    public Faculty getFaculty() {
+        return faculty;
+    }
+
+    public void setFaculty(Faculty faculty) {
+        this.faculty = faculty;
+    }
+
 
 
     public int getP_id() {
@@ -59,6 +71,7 @@ public class Project {
     }
 
 
+
     public Project(int p_id, String title, String description, String status, LocalDate date) {
         this.p_id = p_id;
         this.title = title;
@@ -66,6 +79,7 @@ public class Project {
         this.status = status;
         this.date = LocalDate.now();
     }
+
 
     public Project() {
         this.date=LocalDate.now();

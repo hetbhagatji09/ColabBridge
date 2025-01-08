@@ -1,10 +1,10 @@
 package com.example.facultyservice.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Faculty {
@@ -15,6 +15,8 @@ public class Faculty {
     private String name;
     private String email;
     private String department;
+    @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Project> projects = new HashSet<>();
 
     public int getF_id() {
         return f_id;
@@ -55,5 +57,13 @@ public class Faculty {
 
     public void setF_password(String f_password) {
         this.f_password = f_password;
+    }
+
+    public Set<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(Set<Project> projects) {
+        this.projects = projects;
     }
 }
