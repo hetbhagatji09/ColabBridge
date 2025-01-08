@@ -15,8 +15,6 @@ public class Faculty {
     private String name;
     private String email;
     private String department;
-    @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Project> projects = new HashSet<>();
 
     public int getF_id() {
         return f_id;
@@ -59,11 +57,5 @@ public class Faculty {
         this.f_password = f_password;
     }
 
-    public Set<Project> getProjects() {
-        return projects;
-    }
 
-    public void setProjects(Set<Project> projects) {
-        this.projects = projects;
-    }
 }
