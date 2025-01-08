@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("faculty")
 public class FacultyController {
@@ -18,8 +20,18 @@ public class FacultyController {
     public ResponseEntity<Faculty> registerFaculty(@RequestBody Faculty faculty) {
         return facultyService.registerFaculty(faculty);
     }
-    @PostMapping("/project")
-    public ResponseEntity<Project>createProject(@RequestBody Project project){
-         return facultyService.createProject(project);
+    @GetMapping("{f_id}")
+    ResponseEntity<List<Project>>getProjectsById(@PathVariable int f_id){
+        return facultyService.getProjectsById(f_id);
     }
+    @GetMapping("projectsName/{f_id}")
+    ResponseEntity<List<String>>getProjectsByName(@PathVariable int f_id){
+        return facultyService.getProjectsByName(f_id);
+    }
+    @DeleteMapping("/project/{p_id}")
+    ResponseEntity<String>deleteProject(@PathVariable int p_id){
+        return facultyService.deleteProject(p_id);
+    }
+
+
 }
