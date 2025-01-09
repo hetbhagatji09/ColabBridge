@@ -10,9 +10,7 @@ public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int s_id;
-    private String s_password;
     private String name;
-    private String email;
     private int roll_no;
     private String department;
 
@@ -24,13 +22,7 @@ public class Student {
         this.s_id = s_id;
     }
 
-    public String getS_password() {
-        return s_password;
-    }
 
-    public void setS_password(String s_password) {
-        this.s_password = s_password;
-    }
 
     public String getName() {
         return name;
@@ -40,13 +32,7 @@ public class Student {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
-    }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
     public int getRoll_no() {
         return roll_no;
@@ -64,13 +50,12 @@ public class Student {
         this.department = department;
     }
 
+
     @Override
     public String toString() {
         return "Student{" +
                 "s_id=" + s_id +
-                ", s_password='" + s_password + '\'' +
                 ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
                 ", roll_no=" + roll_no +
                 ", department='" + department + '\'' +
                 '}';

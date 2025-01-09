@@ -12,14 +12,16 @@ public class UserCredential {
     private int id;
     private String username;
     private String password;
+    private String userRole;
 
     public UserCredential() {
     }
 
-    public UserCredential(int id, String username, String password) {
+    public UserCredential(int id, String username, String password, String userRole) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.userRole = userRole;
     }
 
     public int getId() {
@@ -44,5 +46,13 @@ public class UserCredential {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
     }
 }
