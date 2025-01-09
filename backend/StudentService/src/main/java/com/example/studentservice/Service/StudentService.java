@@ -1,7 +1,10 @@
 package com.example.studentservice.Service;
 
 import com.example.studentservice.Dao.StudentDao;
+import com.example.studentservice.Feign.AuthInterface;
 import com.example.studentservice.Model.Student;
+import com.example.studentservice.Model.UserCredential;
+import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -19,9 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class StudentService {
     @Autowired
+    private AuthInterface authInterface;
+    @Autowired
     private StudentDao studentDao;
+
     public ResponseEntity<Student> registerStudent(Student student) {
         try{
                 return new ResponseEntity<>(studentDao.save(student), HttpStatus.OK);
@@ -42,6 +49,7 @@ public class StudentService {
                 Row row = sheet.getRow(i);
                 if (row != null) {
                     Student student = new Student();
+                    UserCredential user=new UserCredential();
                     if (row.getCell(1) != null) {
                         student.setRoll_no((int) Math.round(row.getCell(1).getNumericCellValue()));
                     }
@@ -52,13 +60,17 @@ public class StudentService {
                         student.setDepartment(row.getCell(3).getStringCellValue());
                     }
                     if (row.getCell(4) != null) {
-                        student.setEmail(row.getCell(4).getStringCellValue());
+                        user.setUsername(row.getCell(4).getStringCellValue());
                     }
                     if (row.getCell(5) != null) {
-                        student.setS_password(row.getCell(5).getStringCellValue());
+
+                        user.setPassword(row.getCell(5).getStringCellValue());
                     }
+                    user.setUserRole("STUDENT");
                     System.out.println(student);
                     studentDao.save(student);
+                    authInterface.addNewUser(user);
+
                 }
             }
 
