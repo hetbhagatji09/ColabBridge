@@ -1,6 +1,7 @@
 package com.example.studentservice.Controller;
 
 import com.example.studentservice.Model.Student;
+import com.example.studentservice.Model.UserCredential;
 import com.example.studentservice.Service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 
