@@ -80,6 +80,26 @@ public class Project {
         this.date = LocalDate.now();
     }
 
+    public Project(int p_id, String title, String description, String status, LocalDate date, Faculty faculty) {
+        this.p_id = p_id;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.date = date;
+        this.faculty = faculty;
+    }
+
+    @Override
+    public String toString() {
+        return "Project{" +
+                "p_id=" + p_id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", status='" + status + '\'' +
+                ", date=" + date +
+                ", faculty=" + faculty +
+                '}';
+    }
 
     public Project() {
         this.date=LocalDate.now();

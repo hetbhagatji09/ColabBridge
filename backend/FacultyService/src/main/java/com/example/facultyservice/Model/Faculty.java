@@ -57,5 +57,14 @@ public class Faculty {
         this.f_password = f_password;
     }
 
-
+    @Override
+    public String toString() {
+        return "Faculty{" +
+                "f_id=" + f_id +
+                ", f_password='" + f_password + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", department='" + department + '\'' +
+                '}';
+    }
 }
