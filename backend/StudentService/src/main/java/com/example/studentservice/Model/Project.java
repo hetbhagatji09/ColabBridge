@@ -2,19 +2,20 @@ package com.example.studentservice.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-
-import jakarta.persistence.*;
-
 import java.time.LocalDate;
+import java.util.List;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Project {
-
-
     private int p_id;
     private String title;
     private String description;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
     private LocalDate date;
+    private List<String> skills;
+    @ManyToOne
+    @JoinColumn(name = "facultyId")
     private Faculty faculty;
 
     public Faculty getFaculty() {
@@ -51,13 +52,6 @@ public class Project {
         this.description = description;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     public LocalDate getDate() {
         return date;
@@ -68,16 +62,11 @@ public class Project {
     }
 
 
-
-    public Project(int p_id, String title, String description, String status, LocalDate date) {
-        this.p_id = p_id;
-        this.title = title;
-        this.description = description;
+    public void setStatus(Status status) {
         this.status = status;
-        this.date = LocalDate.now();
     }
 
-    public Project(int p_id, String title, String description, String status, LocalDate date, Faculty faculty) {
+    public Project(int p_id, String title, String description, Status status, LocalDate date, Faculty faculty) {
         this.p_id = p_id;
         this.title = title;
         this.description = description;
@@ -92,7 +81,7 @@ public class Project {
                 "p_id=" + p_id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
-                ", status='" + status + '\'' +
+                ", status=" + status +
                 ", date=" + date +
                 ", faculty=" + faculty +
                 '}';
@@ -102,4 +91,3 @@ public class Project {
         this.date=LocalDate.now();
     }
 }
-
