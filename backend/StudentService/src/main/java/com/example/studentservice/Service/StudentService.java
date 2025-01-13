@@ -3,8 +3,10 @@ package com.example.studentservice.Service;
 import com.example.studentservice.Dao.StudentDao;
 import com.example.studentservice.Feign.AuthInterface;
 import com.example.studentservice.Model.Project;
+import com.example.studentservice.Model.Status;
 import com.example.studentservice.Model.Student;
 import com.example.studentservice.Model.UserCredential;
+import com.netflix.discovery.converters.Auto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.CellType;
@@ -19,17 +21,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class StudentService {
     @Autowired
+    private RestTemplate restTemplate;
+    @Autowired
     private AuthInterface authInterface;
+    private static final String FACULTY_SERVICE_URL = "http://localhost:8765/FACULTY-SERVICE/api/project";
     @Autowired
     private StudentDao studentDao;
 
@@ -47,6 +54,7 @@ public class StudentService {
         System.out.println("Received project from RabbitMQ: " + project);
         // Save the project to the database or update the student UI
     }
+
 
     @Transactional
     public ResponseEntity<String> registerFile(@RequestPart("file") MultipartFile file) {
@@ -104,5 +112,46 @@ public class StudentService {
     }
 
 
+    public ResponseEntity<Project> applyProject(int pId) {
 
+        //fetch project from faculty service
+        try {
+            ResponseEntity<Project> response = restTemplate.getForEntity(FACULTY_SERVICE_URL + "/" + pId, Project.class);
+            if (response.getStatusCode() == HttpStatus.OK) {
+                Project project = response.getBody();
+                if (project != null) {
+                    project.setStatus(Status.APPLIED);
+                      //  restTemplate.put(FACULTY_SERVICE_URL + "/status/" + pId, project);
+
+                    return new ResponseEntity<>(project, HttpStatus.OK);
+
+
+                }
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return null;
+    }
+
+    public ResponseEntity<List<Project>> getAllProjets() {
+        try{
+            ResponseEntity<Project[]> response = restTemplate.getForEntity(FACULTY_SERVICE_URL+"/projects", Project[].class);
+
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                List<Project> projects = Arrays.asList(response.getBody());
+                return new ResponseEntity<>(projects, HttpStatus.OK);
+            } else {
+                // Handle empty or unexpected response
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+    }
 }
