@@ -3,10 +3,10 @@ package com.example.studentservice.Service;
 import com.example.studentservice.Dao.StudentDao;
 import com.example.studentservice.Feign.AuthInterface;
 import com.example.studentservice.Model.Project;
-import com.example.studentservice.Model.Status;
 import com.example.studentservice.Model.Student;
 import com.example.studentservice.Model.UserCredential;
-import com.netflix.discovery.converters.Auto;
+import com.example.studentservice.Dto.NotificationRequest;
+import com.example.studentservice.Model.UserRole;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.CellType;
@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -95,7 +94,7 @@ public class StudentService {
                         }
                     }
 
-                    user.setUserRole("STUDENT");
+                    user.setUserRole(UserRole.STUDENT);
                     students.add(student);
                     users.add(user);
                 }
@@ -112,27 +111,7 @@ public class StudentService {
     }
 
 
-    public ResponseEntity<Project> applyProject(int pId) {
 
-        //fetch project from faculty service
-        try {
-            ResponseEntity<Project> response = restTemplate.getForEntity(FACULTY_SERVICE_URL + "/" + pId, Project.class);
-            if (response.getStatusCode() == HttpStatus.OK) {
-                Project project = response.getBody();
-                if (project != null) {
-                    project.setStatus(Status.APPLIED);
-                      //  restTemplate.put(FACULTY_SERVICE_URL + "/status/" + pId, project);
-
-                    return new ResponseEntity<>(project, HttpStatus.OK);
-
-
-                }
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return null;
-    }
 
     public ResponseEntity<List<Project>> getAllProjets() {
         try{
@@ -153,5 +132,16 @@ public class StudentService {
         }
 
 
+    }
+
+    public ResponseEntity<String> applyProject(int pId, Student student) {
+        try{
+            String url=FACULTY_SERVICE_URL+"/notify";
+            NotificationRequest notificationRequest=new NotificationRequest(pId,student);
+            restTemplate.postForEntity(url,notificationRequest, String.class);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return null;
     }
 }
