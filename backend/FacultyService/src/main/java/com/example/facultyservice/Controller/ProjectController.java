@@ -1,9 +1,11 @@
 package com.example.facultyservice.Controller;
 
 import com.example.facultyservice.Dao.ProjectDao;
+import com.example.facultyservice.Dto.NotificationRequest;
 import com.example.facultyservice.Model.Project;
 import com.example.facultyservice.Service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +36,15 @@ public class ProjectController {
     @GetMapping("projects")
     public ResponseEntity<List<Project>> getAllProjects(){
         return projectService.getAllProjeects();
+    }
+    @PostMapping("notify")
+    public ResponseEntity<String> notifyFaculty(@RequestBody NotificationRequest notificationRequest) {
+
+        System.out.println("Notification received for project ID: " + notificationRequest.getProjectId());
+        System.out.println("Student Details: " + notificationRequest.getStudent());
+
+        // Return response
+        return new ResponseEntity<>("Faculty notified successfully.", HttpStatus.OK);
     }
 
 

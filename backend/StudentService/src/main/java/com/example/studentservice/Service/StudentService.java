@@ -20,12 +20,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -135,13 +137,51 @@ public class StudentService {
     }
 
     public ResponseEntity<String> applyProject(int pId, Student student) {
-        try{
-            String url=FACULTY_SERVICE_URL+"/notify";
-            NotificationRequest notificationRequest=new NotificationRequest(pId,student);
-            restTemplate.postForEntity(url,notificationRequest, String.class);
+        try {
+//            // Step 1: Fetch the project using RestTemplate from the Faculty microservice
+//            String project_url = FACULTY_SERVICE_URL + "/" + pId;
+//            ResponseEntity<Project> response = restTemplate.getForEntity(project_url, Project.class);
+//            Project project = response.getBody();
+//
+//            // Step 2: Handle case where the project was not found
+//            if (project == null) {
+//                System.out.println("Project not found for ID: " + pId);
+//                return new ResponseEntity<>("Project not found", HttpStatus.NOT_FOUND);
+//            }
+//
+//            System.out.println("Fetched Project: " + project);
+//
+//            // Step 3: Initialize the projects set if it's null
+//            if (student.getProjects() == null) {
+//                student.setProjects(new HashSet<>()); // Initialize if null
+//            }
+//
+//            // Step 4: Add the fetched project to the student's projects
+//            student.getProjects().add(project);
+//            System.out.println(student);
+//
+//            // Step 5: Save the updated student (cascading the project save if needed)
+//            studentDao.save(student);
+
+            // Step 6: Notify the faculty (optional step, assuming you want to send a notification)
+            String url = FACULTY_SERVICE_URL + "/notify";
+            NotificationRequest notificationRequest = new NotificationRequest(pId, student);
+            restTemplate.postForEntity(url, notificationRequest, String.class);
+
+            // Step 7: Return success message
+            return new ResponseEntity<>("Project applied successfully", HttpStatus.OK);
+        } catch (RestClientException e) {
+            // Handle RestTemplate communication errors
+            System.err.println("Error with RestTemplate: " + e.getMessage());
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to communicate with external service", HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.OK);
+            // Handle any unexpected errors
+            System.err.println("An unexpected error occurred: " + e.getMessage());
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return null;
     }
+
+
 }

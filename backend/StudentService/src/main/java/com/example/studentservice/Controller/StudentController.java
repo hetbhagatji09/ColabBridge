@@ -28,8 +28,8 @@ public class StudentController {
         return studentService.registerFile(file);
     }
     @PostMapping("apply/{p_id}")
-    public ResponseEntity<Project> applyProject(@PathVariable int p_id){
-        return studentService.applyProject(p_id);
+    public ResponseEntity<String> applyProject(@PathVariable int p_id,@RequestBody Student student){
+        return studentService.applyProject(p_id,student);
 
     }
     @GetMapping("projects")
