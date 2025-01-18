@@ -1,11 +1,8 @@
-package com.example.studentservice.Model;
+package com.example.studentservice.Vo;
 
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.HashSet;
-import java.util.Set;
 
 
 @Getter
