@@ -40,4 +40,8 @@ public class FacultyController {
     public ResponseEntity<List<Student>> getStudentsByProject(@PathVariable int projectId){
         return facultyService.getStudentsByProject(projectId);
     }
+    @GetMapping("studentproject/{projectId}/count")
+    public ResponseEntity<Integer>getStudentCountByProjectId(@PathVariable int projectId){
+        return facultyService.getStudentCountByProjectId(projectId);
+    }
 }

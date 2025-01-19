@@ -30,26 +30,24 @@ public class FacultyService {
     @Autowired
     private ProjectService projectService;
 
-    private final String STUDENT_SERVICE="http://localhost:8765/STUDENT-SERVICE/api/studentProject/";
+    private final String STUDENT_SERVICE = "http://localhost:8765/STUDENT-SERVICE/api/studentProject/";
 
 
     public ResponseEntity<Faculty> registerFaculty(Faculty faculty) {
-        try{
+        try {
             return new ResponseEntity<>(facultyDao.save(faculty), HttpStatus.OK);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
 
     public ResponseEntity<List<Project>> getProjectsById(int facultyId) {
-        try{
-            Faculty faculty=facultyDao.findById(facultyId).get();
-            List<Project>projects=projectDao.findByFacultyId(faculty.getF_id());
-            return new ResponseEntity<>(projects,HttpStatus.OK);
-        }
-        catch(Exception e){
+        try {
+            Faculty faculty = facultyDao.findById(facultyId).get();
+            List<Project> projects = projectDao.findByFacultyId(faculty.getF_id());
+            return new ResponseEntity<>(projects, HttpStatus.OK);
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -64,8 +62,7 @@ public class FacultyService {
                 projectNames.add(project.getTitle());
             }
             return new ResponseEntity<>(projectNames, HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -74,29 +71,42 @@ public class FacultyService {
         try {
             projectDao.deleteById(p_id);
             return new ResponseEntity<>("Project deleted successfully", HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     public ResponseEntity<List<Student>> getStudentsByProject(int projectId) {
-        try{
+        try {
             ResponseEntity<List<Student>> responseEntity = restTemplate.exchange(
                     STUDENT_SERVICE + "/" + projectId,
                     HttpMethod.GET,
                     null,
-                    new ParameterizedTypeReference<List<Student>>() {}
+                    new ParameterizedTypeReference<List<Student>>() {
+                    }
             );
-            List<Student> students=responseEntity.getBody();
-            return  new ResponseEntity<>(students,HttpStatus.OK);
+            List<Student> students = responseEntity.getBody();
+            return new ResponseEntity<>(students, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
 
+    }
 
+    public ResponseEntity<Integer> getStudentCountByProjectId(int projectId) {
+        try {
+            ResponseEntity<Integer> responseEntity = restTemplate.exchange(STUDENT_SERVICE + "/" + projectId + "/student-count", HttpMethod.GET, null, Integer.class);
+            Integer count = responseEntity.getBody();
+            System.out.println(count.intValue());
+            if (count != null) {
+                return new ResponseEntity<>(count.intValue(), HttpStatus.OK);
+            }
 
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return null;
     }
 
 
@@ -108,4 +118,5 @@ public class FacultyService {
 //            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 //        }
 //    }
+
 }
