@@ -4,22 +4,34 @@ import com.example.facultyservice.Dao.FacultyDao;
 import com.example.facultyservice.Dao.ProjectDao;
 import com.example.facultyservice.Model.Faculty;
 import com.example.facultyservice.Model.Project;
+import com.example.facultyservice.Model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class FacultyService {
+    @Autowired
+    private RestTemplate restTemplate;
     @Autowired
     private FacultyDao facultyDao;
     @Autowired
     private ProjectDao projectDao;
     @Autowired
     private ProjectService projectService;
+
+    private final String STUDENT_SERVICE="http://localhost:8765/STUDENT-SERVICE/api/studentProject/";
+
 
     public ResponseEntity<Faculty> registerFaculty(Faculty faculty) {
         try{
@@ -66,6 +78,25 @@ public class FacultyService {
         catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public ResponseEntity<List<Student>> getStudentsByProject(int projectId) {
+        try{
+            ResponseEntity<List<Student>> responseEntity = restTemplate.exchange(
+                    STUDENT_SERVICE + "/" + projectId,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<Student>>() {}
+            );
+            List<Student> students=responseEntity.getBody();
+            return  new ResponseEntity<>(students,HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+
+
+
     }
 
 

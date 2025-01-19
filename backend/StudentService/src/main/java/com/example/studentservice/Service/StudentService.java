@@ -150,6 +150,9 @@ public class StudentService {
     public ResponseEntity<String> applyProject(int studentId,int projectId) {
         try {
             Student student=studentDao.findStudentByStudentId(studentId);
+            if(student==null){
+                return new ResponseEntity<>("Student is not found",HttpStatus.NOT_FOUND);
+            }
             if(studentProjectDao.existsByStudent_StudentIdAndProjectId(studentId,projectId)){
                 return new ResponseEntity<>("Student has already applied for this project",HttpStatus.CONFLICT);
             }
