@@ -22,5 +22,10 @@ public class StudentProjectController {
         return studentProjectService.getStudentIds(projectId);
 
     }
+    @GetMapping("/projects/{projectId}/student-count")
+    public ResponseEntity<Integer> getStudentCountByProject(@PathVariable int projectId) {
+        return studentProjectService.getStudentCountByProjectId(projectId);
+
+    }
 
 }

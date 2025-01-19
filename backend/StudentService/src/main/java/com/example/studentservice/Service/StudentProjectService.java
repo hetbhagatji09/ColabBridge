@@ -37,4 +37,13 @@ public class StudentProjectService {
         }
 
     }
+
+    public ResponseEntity<Integer> getStudentCountByProjectId(int projectId) {
+        try{
+            return new ResponseEntity<>(studentProjectDao.countStudentsByProjectId(projectId),HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+    }
 }
