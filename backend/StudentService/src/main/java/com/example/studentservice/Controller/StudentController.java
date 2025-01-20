@@ -1,5 +1,6 @@
 package com.example.studentservice.Controller;
 
+import com.example.studentservice.Service.StudentProjectService;
 import com.example.studentservice.Vo.Project;
 import com.example.studentservice.Model.Student;
 import com.example.studentservice.Service.StudentService;
@@ -17,6 +18,8 @@ import java.util.List;
 public class StudentController {
     @Autowired
     private StudentService studentService;
+    @Autowired
+    private StudentProjectService studentProjectService;
 
     @PostMapping("register")
     public ResponseEntity<Student> registerStudent(@RequestBody Student student) {
@@ -43,6 +46,10 @@ public class StudentController {
     @PutMapping("{studentId}")
     public ResponseEntity<String> makeUnavailable(@RequestBody Student student){
         return studentService.makeUnavailibity(student);
+    }
+    @GetMapping("project/visible")
+    public ResponseEntity<List<Project>> getVisibleProjects(){
+        return studentProjectService.getVisibleProjects();
     }
 
 

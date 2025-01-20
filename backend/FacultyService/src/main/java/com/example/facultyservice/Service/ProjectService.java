@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,7 +49,7 @@ public class ProjectService {
             Project savedProject = projectDao.save(project);
             System.out.println(project);
             ResponseEntity<Project> response = new ResponseEntity<>(projectDao.save(project), HttpStatus.OK);
-            rabbitTemplate.convertAndSend(exchange, routingKey, project);
+//            rabbitTemplate.convertAndSend(exchange, routingKey, project);
             System.out.println("Project sent to RabbitMQ: " + project);
             System.out.println("Hii Bro");
             System.out.println(project.getDescription());
@@ -85,6 +87,21 @@ public class ProjectService {
             return new ResponseEntity<>(projectDao.findAll(),HttpStatus.OK);
         }
         catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<List<Project>> getVisibleProjects() {
+        try{
+            LocalDateTime currentTime=LocalDateTime.now();
+            System.out.println(currentTime);
+            List<Project> visibleProjects=projectDao.findVisibleProjects(currentTime.minusHours(24),Status.OPEN_FOR_APPLICATIONS);
+            if(visibleProjects==null){
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(visibleProjects,HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
