@@ -3,6 +3,7 @@ package com.example.studentservice.Service;
 import com.example.studentservice.Dao.StudentDao;
 import com.example.studentservice.Dao.StudentProjectDao;
 import com.example.studentservice.Feign.AuthInterface;
+import com.example.studentservice.Model.StudentAvaibility;
 import com.example.studentservice.Model.StudentProject;
 import com.example.studentservice.Vo.Project;
 import com.example.studentservice.Model.Student;
@@ -55,11 +56,11 @@ public class StudentService {
             }
     }
 
-    @RabbitListener(queues = "${rabbitmq.queue}")
-    public void receiveProject(Project project) {
-        System.out.println("Received project from" + project + "by " +project.getFaculty());
-        // Save the project to the database or update the student UI
-    }
+//    @RabbitListener(queues = "${rabbitmq.queue}")
+//    public void receiveProject(Project project) {
+//        System.out.println("Received project from" + project + "by " +project.getFaculty());
+//        // Save the project to the database or update the student UI
+//    }
 
 
     @Transactional
@@ -198,4 +199,22 @@ public class StudentService {
     }
 
 
+    public ResponseEntity<Student> getStudentById(int studentId) {
+        try{
+            return new ResponseEntity<>(studentDao.findStudentByStudentId(studentId),HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    public ResponseEntity<String> makeUnavailibity(Student student) {
+        try{
+            student.setStudentAvaibility(StudentAvaibility.NOT_AVAILABLE);
+            studentDao.save(student);
+            return new ResponseEntity<>("Student is Unavailable Now",HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 }

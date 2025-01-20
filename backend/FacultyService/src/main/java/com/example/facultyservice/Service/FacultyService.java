@@ -2,9 +2,8 @@ package com.example.facultyservice.Service;
 
 import com.example.facultyservice.Dao.FacultyDao;
 import com.example.facultyservice.Dao.ProjectDao;
-import com.example.facultyservice.Model.Faculty;
-import com.example.facultyservice.Model.Project;
-import com.example.facultyservice.Model.Student;
+import com.example.facultyservice.Model.*;
+import feign.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -31,6 +30,7 @@ public class FacultyService {
     private ProjectService projectService;
 
     private final String STUDENT_SERVICE = "http://localhost:8765/STUDENT-SERVICE/api/studentProject/";
+    private final String STUDENT="http://localhost:8765/STUDENT-SERVICE/student";
 
 
     public ResponseEntity<Faculty> registerFaculty(Faculty faculty) {
@@ -109,14 +109,42 @@ public class FacultyService {
         return null;
     }
 
+    public ResponseEntity<String> getApprovedStudent(int facultyId,int projectId,int studentId) {
+        try{
+            Project project=projectDao.findById(projectId).get();
 
-//    public ResponseEntity<Project> createProject(Project project,int f_id) {
-//        try {
-//            return projectService.createProject(project, f_id);
-//        } catch (Exception e) {
-//            System.err.println("Error in FacultyService: " + e.getMessage());
-//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
+            if(project==null){
+                return new ResponseEntity<>("Project Not found",HttpStatus.NOT_FOUND);
+            }
+            System.out.println(project.getFaculty().getF_id());
+            System.out.println(facultyId);
+            if(project.getFaculty().getF_id()!=facultyId){
+
+                return new ResponseEntity<>("Unauthorized faculty for this project", HttpStatus.UNAUTHORIZED);
+            }
+            ResponseEntity<Student> responseEntityStudent=restTemplate.exchange("http://localhost:8765/STUDENT-SERVICE/student/"+studentId,
+                    HttpMethod.GET,
+                    null,
+                    Student.class);
+            Student student=null;
+            if(responseEntityStudent.getStatusCode()==HttpStatus.OK){
+                student=responseEntityStudent.getBody();
+            }
+            if(student.getStudentAvaibility()!= StudentAvaibility.AVAILABLE){
+                return new ResponseEntity<>("Student is aleready asigned ",HttpStatus.CONFLICT);
+            }
+            project.setStatus(Status.APPROVED);
+            projectDao.save(project);
+            student.setStudentAvaibility(StudentAvaibility.NOT_AVAILABLE);
+            restTemplate.put(STUDENT+"/"+studentId,student);
+
+
+            return new ResponseEntity<>("Project is given to student "+student.getName()+ " by "+project.getFaculty().getName(),HttpStatus.OK);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 
 }

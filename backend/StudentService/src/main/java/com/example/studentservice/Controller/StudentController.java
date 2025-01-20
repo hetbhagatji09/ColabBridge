@@ -35,6 +35,15 @@ public class StudentController {
     public ResponseEntity<List<Project>> getAllProjects(){
         return studentService.getAllProjets();
     }
+    @GetMapping("{studentId}")
+    public ResponseEntity<Student> getStudentById(@PathVariable int studentId){
+        return studentService.getStudentById(studentId);
+
+    }
+    @PutMapping("{studentId}")
+    public ResponseEntity<String> makeUnavailable(@RequestBody Student student){
+        return studentService.makeUnavailibity(student);
+    }
 
 
 }
