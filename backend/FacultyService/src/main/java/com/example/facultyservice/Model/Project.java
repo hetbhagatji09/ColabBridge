@@ -25,6 +25,7 @@ public class Project {
     @ManyToOne
     @JoinColumn(name = "facultyId")
     private Faculty faculty;
+    private LocalDateTime deadline;
 
 
 
