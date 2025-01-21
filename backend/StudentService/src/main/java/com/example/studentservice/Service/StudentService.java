@@ -7,6 +7,7 @@ import com.example.studentservice.Model.StudentAvaibility;
 import com.example.studentservice.Model.StudentProject;
 import com.example.studentservice.Vo.Project;
 import com.example.studentservice.Model.Student;
+import com.example.studentservice.Vo.Status;
 import com.example.studentservice.Vo.UserCredential;
 import com.example.studentservice.Dto.NotificationRequest;
 import com.example.studentservice.Vo.UserRole;
@@ -169,7 +170,7 @@ public class StudentService {
             }
             StudentProject studentProject=new StudentProject();
             studentProject.setStudent(student);
-            studentProject.setStatus("APPLIED");
+            studentProject.setStatus(Status.PENDING);
             studentProject.setProjectId(projectId);
             studentProject.setApplicationDate(LocalDate.now());
             studentProjectDao.save(studentProject);
