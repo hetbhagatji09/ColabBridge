@@ -48,4 +48,8 @@ public class FacultyController {
     public ResponseEntity<String> getApprovedStudent(@PathVariable int facultyId,@PathVariable int projectId,@PathVariable int studentId){
         return facultyService.getApprovedStudent(facultyId,projectId,studentId);
     }
+    @PostMapping("{facultyId}/projects")
+    public ResponseEntity<List<Project>> createProjects(@RequestBody List<Project> projects,@PathVariable int facultyId){
+        return facultyService.createProjects(projects,facultyId);
+    }
 }

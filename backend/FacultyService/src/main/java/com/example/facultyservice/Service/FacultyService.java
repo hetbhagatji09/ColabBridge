@@ -147,4 +147,16 @@ public class FacultyService {
 
     }
 
+    public ResponseEntity<List<Project>> createProjects(List<Project> projects,int facultyId) {
+        try{
+            for(Project p:projects){
+                p.setFaculty(facultyDao.findById(facultyId).get());
+            }
+            return new ResponseEntity<>(projectDao.saveAll(projects),HttpStatus.OK);
+        }
+        catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 }
