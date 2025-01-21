@@ -3,7 +3,9 @@ package com.example.studentservice.Service;
 import com.example.studentservice.Dao.StudentDao;
 import com.example.studentservice.Dao.StudentProjectDao;
 import com.example.studentservice.Model.Student;
+import com.example.studentservice.Model.StudentProject;
 import com.example.studentservice.Vo.Project;
+import com.example.studentservice.Vo.Status;
 import com.netflix.discovery.converters.Auto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -75,5 +77,28 @@ public class StudentProjectService {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public ResponseEntity<List<StudentProject>> getAllStudentsBYProj(int projectId) {
+        try{
+            List<StudentProject> studProj=studentProjectDao.findByProjectId(projectId);
+            return new ResponseEntity<>(studProj,HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    public ResponseEntity<String> updateStatus(int studentId,int projectId){
+        List<StudentProject> studProj=studentProjectDao.findByProjectId(projectId);
+        for(StudentProject s:studProj){
+            if(s.getStudent().getStudentId()==studentId){
+                s.setStatus(Status.APPROVED);
+            }
+            else {
+                s.setStatus(Status.REJECTED);
+            }
+        }
+        studentProjectDao.saveAll(studProj);
+        return new ResponseEntity<>("Status Are updated",HttpStatus.OK);
+
     }
 }

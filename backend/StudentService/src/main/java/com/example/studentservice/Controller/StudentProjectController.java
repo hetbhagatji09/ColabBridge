@@ -1,13 +1,13 @@
 package com.example.studentservice.Controller;
 
 import com.example.studentservice.Model.Student;
+import com.example.studentservice.Model.StudentProject;
 import com.example.studentservice.Service.StudentProjectService;
+import feign.Param;
+import feign.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,6 +25,16 @@ public class StudentProjectController {
     @GetMapping("{projectId}/student-count")
     public ResponseEntity<Integer> getStudentCountByProject(@PathVariable int projectId) {
         return studentProjectService.getStudentCountByProjectId(projectId);
+    }
+    @GetMapping("student/{projectId}")
+    public ResponseEntity<List<StudentProject>> getAllStud(@PathVariable int projectId){
+        return studentProjectService.getAllStudentsBYProj(projectId);
+    }
+    @PutMapping("updateStatus/{studentId}/{projectId}")
+    public ResponseEntity<String> updateStatus(@PathVariable int studentId, @PathVariable int projectId){
+
+        return studentProjectService.updateStatus(studentId,projectId);
+
     }
 
 }

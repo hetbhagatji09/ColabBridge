@@ -168,6 +168,9 @@ public class StudentService {
                 System.out.println("Project not found for ID: " + projectId);
                 return new ResponseEntity<>("Project not found", HttpStatus.NOT_FOUND);
             }
+            if(project.getStatus()==Status.APPROVED){
+                new ResponseEntity<>("Student is aleready registered",HttpStatus.CONFLICT);
+            }
             StudentProject studentProject=new StudentProject();
             studentProject.setStudent(student);
             studentProject.setStatus(Status.PENDING);

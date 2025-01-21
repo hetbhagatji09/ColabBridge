@@ -3,7 +3,6 @@ package com.example.facultyservice.Service;
 import com.example.facultyservice.Dao.FacultyDao;
 import com.example.facultyservice.Dao.ProjectDao;
 import com.example.facultyservice.Model.*;
-import feign.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -14,9 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.web.client.RestTemplate;
+
 
 @Service
 public class FacultyService {
@@ -112,12 +109,11 @@ public class FacultyService {
     public ResponseEntity<String> getApprovedStudent(int facultyId,int projectId,int studentId) {
         try{
             Project project=projectDao.findById(projectId).get();
-
+            String updateUrl=STUDENT_SERVICE+"/updateStatus/"+studentId+"/"+projectId;
+            restTemplate.put(updateUrl,null);
             if(project==null){
                 return new ResponseEntity<>("Project Not found",HttpStatus.NOT_FOUND);
             }
-            System.out.println(project.getFaculty().getF_id());
-            System.out.println(facultyId);
             if(project.getFaculty().getF_id()!=facultyId){
 
                 return new ResponseEntity<>("Unauthorized faculty for this project", HttpStatus.UNAUTHORIZED);
@@ -139,13 +135,14 @@ public class FacultyService {
             restTemplate.put(STUDENT+"/"+studentId,student);
 
 
+
             return new ResponseEntity<>("Project is given to student "+student.getName()+ " by "+project.getFaculty().getName(),HttpStatus.OK);
 
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+            } catch (Exception e) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
 
-    }
+        }
 
     public ResponseEntity<List<Project>> createProjects(List<Project> projects,int facultyId) {
         try{

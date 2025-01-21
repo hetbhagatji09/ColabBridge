@@ -16,4 +16,6 @@ public interface StudentProjectDao extends JpaRepository<StudentProject,Integer>
     List<Integer> findStudent_StudentIdByProjectId(int projectId);
     @Query("SELECT COUNT(sp) FROM StudentProject sp WHERE sp.projectId = :projectId")
     int countStudentsByProjectId(@Param("projectId") int projectId);
+
+    List<StudentProject> findByProjectId(int projectId);
 }

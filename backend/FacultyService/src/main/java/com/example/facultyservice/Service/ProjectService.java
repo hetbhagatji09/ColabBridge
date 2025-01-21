@@ -49,15 +49,10 @@ public class ProjectService {
             Project savedProject = projectDao.save(project);
             System.out.println(project);
             ResponseEntity<Project> response = new ResponseEntity<>(projectDao.save(project), HttpStatus.OK);
-//            rabbitTemplate.convertAndSend(exchange, routingKey, project);
+
             System.out.println("Project sent to RabbitMQ: " + project);
             System.out.println("Hii Bro");
             System.out.println(project.getDescription());
-//            if (response.getStatusCode().is2xxSuccessful()) {
-//                messagingTemplate.convertAndSend("/topic/notify-students",
-//                        "New project created: " + project.getTitle());
-//                System.out.println("Project created: " + project.getTitle());
-//            }
             return response;
         } catch (Exception e) {
             System.out.println("Error in ProjectService: " + e.getMessage());
@@ -77,7 +72,7 @@ public class ProjectService {
     public ResponseEntity<Project> updateStatus(int projectId) {
         Optional<Project> project=projectDao.findById(projectId);
        Project projectupdate=project.get();
-       projectupdate.setStatus(Status.APPLIED);
+       projectupdate.setStatus(Status.PENDING);
        projectDao.save(projectupdate);
         return new ResponseEntity<>(projectupdate,HttpStatus.OK);
     }
