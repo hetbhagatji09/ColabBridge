@@ -271,4 +271,16 @@ public class StudentService {
         }
         return null;
     }
+
+    public ResponseEntity<Student> findStudentById(int studentId) {
+        try{
+            Optional<Student> optionalStudent=studentDao.findById(studentId);
+            if(optionalStudent.isPresent()){
+                return new ResponseEntity<>(optionalStudent.get(),HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return null;
+    }
 }

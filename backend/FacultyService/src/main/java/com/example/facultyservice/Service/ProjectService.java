@@ -91,6 +91,7 @@ public class ProjectService {
             LocalDateTime currentTime=LocalDateTime.now();
             System.out.println(currentTime);
             List<Project> visibleProjects=projectDao.findVisibleProjects(currentTime.minusHours(24),Status.OPEN_FOR_APPLICATIONS);
+
             if(visibleProjects==null){
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
@@ -100,4 +101,6 @@ public class ProjectService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 }

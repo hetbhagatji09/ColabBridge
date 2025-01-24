@@ -17,7 +17,7 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int reportId;
     @Lob
-    @Column(columnDefinition = "BLOB")
+    @Column(name = "file_data", nullable = false)
     private byte[] fileData;
     private String fileName;
     private String contentType;
