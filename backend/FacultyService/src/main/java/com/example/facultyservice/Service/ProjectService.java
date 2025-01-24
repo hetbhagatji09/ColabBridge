@@ -5,6 +5,7 @@ import com.example.facultyservice.Dao.ProjectDao;
 import com.example.facultyservice.Model.Faculty;
 import com.example.facultyservice.Model.Project;
 import com.example.facultyservice.Model.Status;
+import feign.Param;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -100,6 +101,17 @@ public class ProjectService {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public ResponseEntity<List<Project>> updateExpiredProjects(){
+        try{
+            LocalDateTime currentTime=LocalDateTime.now();
+            List<Project> expiredProjects=projectDao.findExpiredProjects(Status.OPEN_FOR_APPLICATIONS,currentTime.minusHours(24));
+            return new ResponseEntity<>(expiredProjects,HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
 
