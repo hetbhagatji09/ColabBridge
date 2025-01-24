@@ -21,6 +21,7 @@ public class ReportController {
             @RequestParam("projectId") int projectId,
             @RequestParam("file") MultipartFile file
     ){
+        System.out.println("Student service");
         return reportService.submitReport(studentId,projectId,file);
 
     }
