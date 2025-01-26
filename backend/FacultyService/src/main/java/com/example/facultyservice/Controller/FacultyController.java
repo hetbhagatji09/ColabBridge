@@ -46,9 +46,9 @@ public class FacultyController {
     public ResponseEntity<Integer>getStudentCountByProjectId(@PathVariable int projectId){
         return facultyService.getStudentCountByProjectId(projectId);
     }
-    @PostMapping("{facultyId}/studentproject/{projectId}/approved/{studentId}")
-    public ResponseEntity<String> getApprovedStudent(@PathVariable int facultyId,@PathVariable int projectId,@PathVariable int studentId){
-        return facultyService.getApprovedStudent(facultyId,projectId,studentId);
+    @PostMapping("{facultyId}/studentproject/{projectId}/approved")
+    public ResponseEntity<String> getApprovedStudent(@PathVariable int facultyId,@PathVariable int projectId,@RequestBody List<Integer>studentIds){
+        return facultyService.getApprovedStudent(facultyId,projectId,studentIds);
     }
     @PostMapping("{facultyId}/projects")
     public ResponseEntity<List<Project>> createProjects(@RequestBody List<Project> projects,@PathVariable int facultyId){
