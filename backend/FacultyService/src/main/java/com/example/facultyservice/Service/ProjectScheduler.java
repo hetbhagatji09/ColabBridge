@@ -19,7 +19,7 @@ public class ProjectScheduler {
     @Autowired
     private ProjectDao projectDao;
 
-    @Scheduled(cron = "0 0 * * * ?")
+    @Scheduled(cron = "0 * * * * ?")
     public void scheduleProjectStatusUpdate(){
         ResponseEntity<List<Project>> projectsResponse=projectService.updateExpiredProjects();
         List<Project> projects=null;

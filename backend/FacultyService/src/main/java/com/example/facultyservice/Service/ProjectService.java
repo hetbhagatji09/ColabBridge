@@ -106,13 +106,14 @@ public class ProjectService {
     public ResponseEntity<List<Project>> updateExpiredProjects(){
         try{
             LocalDateTime currentTime=LocalDateTime.now();
-            List<Project> expiredProjects=projectDao.findExpiredProjects(Status.OPEN_FOR_APPLICATIONS,currentTime.minusHours(24));
+            List<Project> expiredProjects=projectDao.findExpiredProjects(Status.OPEN_FOR_APPLICATIONS,currentTime);
             return new ResponseEntity<>(expiredProjects,HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
+
 
 
 }
