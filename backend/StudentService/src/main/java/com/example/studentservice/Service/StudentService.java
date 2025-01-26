@@ -295,4 +295,14 @@ public class StudentService {
         }
         return null;
     }
+
+    public ResponseEntity<List<Student>> getAllStudentsById(List<Integer> ids) {
+        try{
+            List<Student> students=studentDao.findAllByStudentId(ids);
+            return new ResponseEntity<>(students,HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 }
