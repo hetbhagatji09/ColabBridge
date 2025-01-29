@@ -132,12 +132,14 @@ public class FacultyService {
             List<Student>students = null;
             if (responseEntityStudent.getStatusCode() == HttpStatus.OK) {
                 students = responseEntityStudent.getBody();
+                System.out.println(students);
             }
             for(Student s :students){
-                if (s.getStudentAvaibility() != StudentAvaibility.AVAILABLE) {
-                    return new ResponseEntity<>("Student is aleready asigned ", HttpStatus.CONFLICT);
-                }
+//                if (s.getStudentAvaibility() != StudentAvaibility.AVAILABLE) {
+//                    return new ResponseEntity<>("Student is aleready asigned ", HttpStatus.CONFLICT);
+//                }
                 s.setStudentAvaibility(StudentAvaibility.NOT_AVAILABLE);
+                System.out.println(studentIds);
                 restTemplate.put(STUDENT + "/" + s.getStudentId(), s);
             }
             for (int studentId:studentIds){
@@ -150,7 +152,10 @@ public class FacultyService {
 //                return new ResponseEntity<>("Student is aleready asigned ", HttpStatus.CONFLICT);
 //            }
             Project project = projectDao.findById(projectId).get();
-
+            project.setStatus(Status.APPROVED);
+            System.out.println("Are you update bro");
+            projectDao.save(project);
+            System.out.println("Are you after update bro");
 //
 //
             if (project == null) {
@@ -161,12 +166,8 @@ public class FacultyService {
                 return new ResponseEntity<>("Unauthorized faculty for this project", HttpStatus.UNAUTHORIZED);
             }
 
-            project.setStatus(Status.APPROVED);
-            projectDao.save(project);
-//            student.setStudentAvaibility(StudentAvaibility.NOT_AVAILABLE);
-//            restTemplate.put(STUDENT + "/" + studentId, student);
-//
-//
+
+
             return new ResponseEntity<>("Project is given to student " + " by " + project.getFaculty().getName(), HttpStatus.OK);
 //
   //       return new ResponseEntity<>("Success",HttpStatus.OK);

@@ -2,9 +2,11 @@ package com.example.facultyservice.Service;
 
 import com.example.facultyservice.Dao.FacultyDao;
 import com.example.facultyservice.Dao.ProjectDao;
+import com.example.facultyservice.Feign.StudentInterface;
 import com.example.facultyservice.Model.Faculty;
 import com.example.facultyservice.Model.Project;
 import com.example.facultyservice.Model.Status;
+import com.netflix.discovery.converters.Auto;
 import feign.Param;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,8 @@ public class ProjectService {
     private RabbitTemplate rabbitTemplate;
     @Value("${rabbitmq.exchange}")
     private String exchange;
-
+    @Autowired
+    private StudentInterface studentInterface;
     @Value("${rabbitmq.routing-key}")
     private String routingKey;
     @Autowired
@@ -106,7 +109,7 @@ public class ProjectService {
     public ResponseEntity<List<Project>> updateExpiredProjects(){
         try{
             LocalDateTime currentTime=LocalDateTime.now();
-            List<Project> expiredProjects=projectDao.findExpiredProjects(Status.OPEN_FOR_APPLICATIONS,currentTime);
+            List<Project> expiredProjects=projectDao.findExpiredProjects(Status.OPEN_FOR_APPLICATIONS,currentTime.minusHours(24));
             return new ResponseEntity<>(expiredProjects,HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -115,5 +118,26 @@ public class ProjectService {
     }
 
 
+    public ResponseEntity<Project> completeProject(int projectId) {
+        try{
+            System.out.println(projectId +" in faculty service");
+            Project project=projectDao.findById(projectId).get();
+            if(project==null){
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
 
+            project.setStatus(Status.COMPLETED);
+            System.out.println("Hey Before client");
+            ResponseEntity<String>st=studentInterface.updateStudentsAvailable(projectId);
+            System.out.println(st);
+            System.out.println("Hey AAfter client");
+            projectDao.save(project);
+            return new ResponseEntity<>(project,HttpStatus.OK);
+
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

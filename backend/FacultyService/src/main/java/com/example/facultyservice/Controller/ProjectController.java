@@ -64,6 +64,11 @@ public class ProjectController {
         return projectService.updateExpiredProjects();
     }
 
+    @PutMapping("{projectId}/completed")
+    public ResponseEntity<Project> completeProject(@PathVariable int projectId){
+        System.out.println(projectId +" in faculty controller");
+        return projectService.completeProject(projectId);
+    }
 
 
 }
