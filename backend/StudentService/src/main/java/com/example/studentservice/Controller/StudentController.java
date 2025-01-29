@@ -77,6 +77,12 @@ public class StudentController {
         return studentService.getAllStudentsById(ids);
 
     }
+    @PutMapping("available/{projectId}")
+    public ResponseEntity<String> updateStudentsAvailable(@PathVariable int projectId){
+        System.out.println("Hy Path" );
+        return studentService.updateStudentsAvailable(projectId);
+
+    }
 
 
 

@@ -168,6 +168,9 @@ public class StudentService {
     public ResponseEntity<String> applyProject(int studentId,int projectId) {
         try {
             Student student=studentDao.findStudentByStudentId(studentId);
+            if(student.getStudentAvaibility()==StudentAvaibility.NOT_AVAILABLE){
+                return new ResponseEntity<>("You cant Apply Because You are working on project",HttpStatus.CONFLICT);
+            }
             if(student==null){
                 return new ResponseEntity<>("Student is not found",HttpStatus.NOT_FOUND);
             }
@@ -305,4 +308,50 @@ public class StudentService {
         }
 
     }
+
+    public ResponseEntity<String> updateStudentsAvailable(int projectId) {
+        try {
+            System.out.println(projectId + " in student service");
+
+            List<Integer> studentIds = studentProjectDao.findStudent_StudentIdByProjectId(projectId);
+            System.out.println("Student IDs: " + studentIds);
+
+            List<Student> students = new ArrayList<>(); // Mutable list
+            for (int studentId : studentIds) {
+                Optional<Student> optionalStudent = studentDao.findById(studentId);
+                if (optionalStudent.isPresent()) {
+                    Student s = optionalStudent.get();
+                    System.out.println("Fetched Student: " + s.getName() + " (ID: " + s.getStudentId() + ")");
+                    students.add(s);
+                } else {
+                    System.out.println("Student with ID " + studentId + " not found.");
+                    return new ResponseEntity<>("Student with ID " + studentId + " not found.", HttpStatus.NOT_FOUND);
+                }
+            }
+
+            // Update availability
+            for (Student s : students) {
+                if (s.getStudentAvaibility() == StudentAvaibility.NOT_AVAILABLE) {
+                    s.setStudentAvaibility(StudentAvaibility.AVAILABLE);
+                }
+            }
+            List<StudentProject> studentProjects=studentProjectDao.findByProjectId(projectId);
+            for (StudentProject s:studentProjects){
+                if(s.getStatus()==Status.APPROVED){
+                    s.setStatus(Status.COMPLETED);
+                }
+            }
+            studentProjectDao.saveAll(studentProjects);
+
+
+            studentDao.saveAll(students);
+            System.out.println("Students updated successfully.");
+            return new ResponseEntity<>("Project is completed", HttpStatus.OK);
+
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception stack trace
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
