@@ -15,4 +15,7 @@ public interface StudentDao extends JpaRepository<Student,Integer> {
     boolean existsByEmail(String email);
     @Query("SELECT s FROM Student s WHERE s.studentId IN :ids")
     List<Student> findAllByStudentId(List<Integer> ids);
+
+    @Query("SELECT  COUNT(s) FROM Student s")
+    Integer findTotalUsers();
 }

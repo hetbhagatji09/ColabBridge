@@ -83,6 +83,11 @@ public class StudentController {
         return studentService.updateStudentsAvailable(projectId);
 
     }
+    @GetMapping("/count")
+    public ResponseEntity<Integer> getCount(){
+        return studentService.getCount();
+
+    }
 
 
 

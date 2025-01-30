@@ -59,5 +59,10 @@ public class FacultyController {
         return facultyService.registerFileForFaculty(file);
 
     }
+    @GetMapping("/count")
+    public ResponseEntity<Integer> getCount(){
+        return facultyService.getCount();
+
+    }
 
 }
