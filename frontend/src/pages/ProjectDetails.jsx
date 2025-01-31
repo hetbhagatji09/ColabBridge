@@ -10,7 +10,7 @@ const mockProject = {
   title: 'AI-Powered Learning Assistant',
   description: 'Develop an AI-based learning assistant to help students with their studies. The project aims to create an intelligent tutoring system that adapts to individual learning styles and provides personalized feedback.',
   faculty: 'Dr. Smith',
-  status: 'open' as const,
+  status: 'open',
   enrolledCount: 2,
   maxEnrollment: 4,
   requirements: [

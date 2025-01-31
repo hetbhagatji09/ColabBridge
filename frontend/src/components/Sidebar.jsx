@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { LayoutDashboard, CheckSquare, MessageSquare } from 'lucide-react';
 
 const sidebarItems = [
-  { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/confirmed-projects', icon: CheckSquare, label: 'My Projects' },
   { path: '/feedback', icon: MessageSquare, label: 'Feedback' },
 ];

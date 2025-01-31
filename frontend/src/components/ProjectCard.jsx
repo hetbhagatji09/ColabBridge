@@ -2,19 +2,7 @@ import { motion } from 'framer-motion';
 import { Users, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-interface ProjectCardProps {
-  project: {
-    id: string;
-    title: string;
-    description: string;
-    faculty: string;
-    status: 'open' | 'closed';
-    enrolledCount: number;
-    maxEnrollment: number;
-  };
-}
-
-const ProjectCard = ({ project }: ProjectCardProps) => {
+const ProjectCard = ({ project }) => {
   return (
     <motion.div
       whileHover={{ y: -5 }}

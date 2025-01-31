@@ -7,7 +7,7 @@ const Feedback = () => {
   const [feedback, setFeedback] = useState('');
   const [isSending, setIsSending] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!feedback.trim()) {
       toast.error('Please enter your feedback');

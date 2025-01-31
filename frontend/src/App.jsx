@@ -3,8 +3,6 @@ import { Toaster } from 'react-hot-toast';
 import { AnimatePresence } from 'framer-motion';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import Home from './pages/Home';
-import About from './pages/About';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProjectDetails from './pages/ProjectDetails';
@@ -26,18 +24,16 @@ function App() {
           <Toaster position="top-right" />
           <AnimatePresence mode="wait">
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
               <Route path="/login" element={<Login />} />
               <Route
-                path="/dashboard"
+                path="/"
                 element={
                   <ProtectedRoute>
                     <Layout />
                   </ProtectedRoute>
                 }
               >
-                <Route index element={<Dashboard />} />
+                <Route path='dashboard' element={<Dashboard />} />
                 <Route path="project/:id" element={<ProjectDetails />} />
                 <Route path="confirmed-projects" element={<ConfirmedProjects />} />
                 <Route path="feedback" element={<Feedback />} />

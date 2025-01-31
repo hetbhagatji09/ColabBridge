@@ -1,12 +1,7 @@
 import { Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-interface SearchBarProps {
-  value: string;
-  onChange: (value: string) => void;
-}
-
-const SearchBar = ({ value, onChange }: SearchBarProps) => {
+const SearchBar = ({ value, onChange }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
