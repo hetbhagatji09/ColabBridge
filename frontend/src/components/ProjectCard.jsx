@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Users, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const ProjectCard = ({ project }) => {
@@ -17,12 +17,12 @@ const ProjectCard = ({ project }) => {
           </h3>
           <span
             className={`px-3 py-1 rounded-full text-sm font-medium ${
-              project.status === 'open'
+              project.status === 'OPEN_FOR_APPLICATIONS'
                 ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
                 : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
             }`}
           >
-            {project.status}
+            {project.status.replaceAll('_', ' ')}
           </span>
         </div>
 
@@ -32,19 +32,16 @@ const ProjectCard = ({ project }) => {
 
         <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
           <div className="flex items-center">
-            <Users className="h-4 w-4 mr-1" />
-            <span>
-              {project.enrolledCount}/{project.maxEnrollment} enrolled
-            </span>
+            <Clock className="h-4 w-4 mr-1" />
+            <span>Deadline: {new Date(project.deadline).toLocaleDateString()}</span>
           </div>
           <div className="flex items-center">
-            <Clock className="h-4 w-4 mr-1" />
-            <span>{project.faculty}</span>
+            <span>Faculty: {project.faculty.name}</span>
           </div>
         </div>
 
         <Link
-          to={`/project/${project.id}`}
+          to={`/project/${project.projectId}`}
           className="mt-4 block w-full text-center py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
         >
           View Details

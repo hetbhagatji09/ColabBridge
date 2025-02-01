@@ -1,35 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { motion } from 'framer-motion';
 import ProjectCard from '../components/ProjectCard';
 import SearchBar from '../components/SearchBar';
 
-// Mock data - replace with API call
-const mockProjects = [
-  {
-    id: '1',
-    title: 'AI-Powered Learning Assistant',
-    description: 'Develop an AI-based learning assistant to help students with their studies.',
-    faculty: 'Dr. Smith',
-    status: 'open',
-    enrolledCount: 2,
-    maxEnrollment: 4,
-  },
-  {
-    id: '2',
-    title: 'Smart Campus Navigation',
-    description: 'Create a mobile app for efficient campus navigation using indoor positioning.',
-    faculty: 'Prof. Johnson',
-    status: 'open',
-    enrolledCount: 3,
-    maxEnrollment: 5,
-  },
-  // Add more mock projects...
-];
-
 const Dashboard = () => {
+  const [projects, setProjects] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const filteredProjects = mockProjects.filter((project) =>
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get('http://localhost:8765/STUDENT-SERVICE/students/project/visible');
+        setProjects(response.data); // Use fetched data
+      } catch (error) {
+        setError('Failed to fetch projects');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProjects();
+  }, []);
+
+  const filteredProjects = projects.filter((project) =>
     project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     project.faculty.toLowerCase().includes(searchQuery.toLowerCase()) ||
     project.status.toLowerCase().includes(searchQuery.toLowerCase())
@@ -47,11 +42,17 @@ const Dashboard = () => {
 
       <SearchBar value={searchQuery} onChange={setSearchQuery} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProjects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
-        ))}
-      </div>
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProjects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
