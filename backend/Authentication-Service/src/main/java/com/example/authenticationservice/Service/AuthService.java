@@ -3,6 +3,8 @@ package com.example.authenticationservice.Service;
 import com.example.authenticationservice.Dao.UserCredentialDao;
 import com.example.authenticationservice.Model.UserCredential;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,5 +39,14 @@ public class AuthService {
     }
     public boolean validateToken(String token, String userRole) {
         return jwtService.validateToken(token, userRole);
+    }
+
+    public ResponseEntity<String> updatePassword(UserCredential user) {
+        UserCredential existingUser=userCredentialDao.findByUsername(user.getUsername())
+                .orElseThrow(()-> new RuntimeException("User not found"));
+        existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        userCredentialDao.save(existingUser);
+        return new ResponseEntity<>("Password updated successfully", HttpStatus.OK);
+
     }
 }
