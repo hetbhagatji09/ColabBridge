@@ -42,7 +42,7 @@ public class AuthController {
         );
 
         if (authentication.isAuthenticated()) {
-            String token = authService.generateToken(authRequest.getUsername(), authRequest.getUserRole());
+            String token = authService.generateToken(authRequest.getUsername());
             Map<String, String> response = new HashMap<>();
             response.put("token", token);
             return ResponseEntity.ok(response); // Return token in a JSON response
@@ -52,8 +52,8 @@ public class AuthController {
     }
 
     @GetMapping("/validate")
-    public String validateToken(@RequestParam String token, @RequestParam String userRole) {
-        if (authService.validateToken(token, userRole)) {
+    public String validateToken(@RequestParam String token) {
+        if (authService.validateToken(token)) {
             return "Token is valid";
         } else {
             throw new RuntimeException("Invalid or expired token");

@@ -27,18 +27,15 @@ public class AuthService {
         userCredentialDao.saveAll(users);
         return "Users saved";
     }
-    public String generateToken(String username, String userRole) {
+    public String generateToken(String username) {
         UserCredential user = userCredentialDao.findByUsername(username).orElseThrow(() ->
                 new RuntimeException("User not found"));
 
-        if (!user.getUserRole().name().equalsIgnoreCase(userRole)) {
-            throw new RuntimeException("Unauthorized role");
-        }
 
-        return jwtService.generateToken(username, userRole);
+        return jwtService.generateToken(username);
     }
-    public boolean validateToken(String token, String userRole) {
-        return jwtService.validateToken(token, userRole);
+    public boolean validateToken(String token) {
+        return jwtService.validateToken(token);
     }
 
     public ResponseEntity<String> updatePassword(UserCredential user) {
