@@ -46,4 +46,15 @@ public class AuthService {
         return new ResponseEntity<>("Password updated successfully", HttpStatus.OK);
 
     }
+    public ResponseEntity<UserCredential> getUserdetails(String token) {
+        if (!jwtService.validateToken(token)) {
+            return ResponseEntity.status(401).build();
+        }
+        System.out.println("Fuck You Bro");
+        String username = jwtService.extractUsername(token);
+        UserCredential user = jwtService.getUserByUsername(username);
+        return ResponseEntity.ok(user);
+
+
+    }
 }

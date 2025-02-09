@@ -59,5 +59,11 @@ public class AuthController {
             throw new RuntimeException("Invalid or expired token");
         }
     }
+    @GetMapping("/user")
+    public ResponseEntity<UserCredential> getUserDetails(@RequestParam("token") String token) {
+
+        System.out.println("Hello");
+        return authService.getUserdetails(token);
+    }
 
 }

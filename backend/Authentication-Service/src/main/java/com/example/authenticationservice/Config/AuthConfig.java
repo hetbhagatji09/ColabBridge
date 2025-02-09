@@ -41,7 +41,7 @@ public class AuthConfig {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight requests
-                .requestMatchers("/auth/register", "/auth/token", "/auth/validate", "/auth/updatePassword").permitAll()
+                .requestMatchers("/auth/register", "/auth/token", "/auth/validate","/auth/user", "/auth/updatePassword").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
