@@ -69,6 +69,10 @@ public class ProjectController {
         System.out.println(projectId +" in faculty controller");
         return projectService.completeProject(projectId);
     }
+    @PutMapping("{projectId}")
+    public ResponseEntity<Project> updateProject(@PathVariable int projectId,@RequestBody Project updatedProject){
+        return projectService.updateProject(projectId,updatedProject);
+    }
 
 
 }

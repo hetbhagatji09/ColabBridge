@@ -140,4 +140,26 @@ public class ProjectService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public ResponseEntity<Project> updateProject(int projectId, Project updatedProject) {
+        try{
+            Optional<Project> p=projectDao.findById(projectId);
+            Project project=null;
+            if(p.isPresent()){
+                project=p.get();
+                project.setTitle(updatedProject.getTitle());
+                project.setDescription(updatedProject.getDescription());
+                project.setDeadline(updatedProject.getDeadline());
+                project.setApplicationDeadline(updatedProject.getApplicationDeadline());
+                project.setSkills(updatedProject.getSkills());
+                projectDao.save(project);
+
+            }
+            return new ResponseEntity<>(project,HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+    }
 }
