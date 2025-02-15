@@ -13,7 +13,7 @@ public interface ProjectDao extends JpaRepository<Project,Integer> {
 
     @Query("SELECT p FROM Project p WHERE p.faculty.f_id = :facultyId")
     List<Project> findByFacultyId(@Param("facultyId") int facultyId);
-    @Query("SELECT p FROM Project p WHERE p.date >= :thresoldTime AND p.status = :status")
+    @Query("SELECT p FROM Project p WHERE p.applicationDeadline >= :thresoldTime AND p.status = :status")
     List<Project> findVisibleProjects(@Param("thresoldTime") LocalDateTime localDateTime, @Param("status") Status status);
 
     @Query("SELECT p FROM Project p WHERE p.status = :status AND p.applicationDeadline <= :thresholdTime")

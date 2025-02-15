@@ -94,7 +94,7 @@ public class ProjectService {
         try{
             LocalDateTime currentTime=LocalDateTime.now();
             System.out.println(currentTime);
-            List<Project> visibleProjects=projectDao.findVisibleProjects(currentTime.minusHours(24),Status.OPEN_FOR_APPLICATIONS);
+            List<Project> visibleProjects=projectDao.findVisibleProjects(currentTime,Status.OPEN_FOR_APPLICATIONS);
 
             if(visibleProjects==null){
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
