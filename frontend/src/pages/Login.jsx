@@ -8,7 +8,8 @@ const Login = () => {
   const [showRoleSelection, setShowRoleSelection] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, setSelectedRole } = useAuth();
+  const [selectedRole, setSelectedRole] = useState(null); // Store role in component state
+  const { login } = useAuth(); // Removed setSelectedRole, as it doesn't exist in AuthContext
 
   const handleRoleSelect = (role) => {
     setSelectedRole(role);
@@ -20,42 +21,31 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
+    console.log("Sign in ");
     e.preventDefault();
+    if (!selectedRole) {
+      alert("Please select a role.");
+      return;
+    }
     try {
-      await login(email, password);
+      console.log("Go into Login ")
+      await login(email, password, selectedRole);
     } catch (error) {
-      // Error is handled in AuthContext
+      console.error("Login error:", error);
     }
   };
+  
 
   const roles = [
-    {
-      id: 'admin',
-      title: 'Admin',
-      icon: UserCog,
-      description: 'System administration and management',
-      color: 'from-purple-500 to-purple-600',
-    },
-    {
-      id: 'faculty',
-      title: 'Faculty',
-      icon: Users,
-      description: 'Teaching and course management',
-      color: 'from-blue-500 to-blue-600',
-    },
-    {
-      id: 'student',
-      title: 'Student',
-      icon: GraduationCap,
-      description: 'Learning and collaboration',
-      color: 'from-green-500 to-green-600',
-    },
+    { id: 'admin', title: 'Admin', icon: UserCog, color: 'from-purple-500 to-purple-600' },
+    { id: 'faculty', title: 'Faculty', icon: Users, color: 'from-blue-500 to-blue-600' },
+    { id: 'student', title: 'Student', icon: GraduationCap, color: 'from-green-500 to-green-600' },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-      <Navbar />
-      
+      {/* <Navbar /> */}
+
       <div className="container mx-auto px-6 pt-32 pb-16">
         <AnimatePresence mode="wait">
           {showRoleSelection ? (
@@ -84,7 +74,6 @@ const Login = () => {
                       <div className="flex flex-col items-center text-center space-y-4">
                         <Icon className="h-12 w-12" />
                         <h3 className="text-xl font-semibold">{role.title}</h3>
-                        <p className="text-sm opacity-90">{role.description}</p>
                       </div>
                     </motion.button>
                   );
