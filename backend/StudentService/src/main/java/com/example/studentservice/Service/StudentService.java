@@ -168,12 +168,13 @@ public class StudentService {
     public ResponseEntity<String> applyProject(int studentId,int projectId) {
         try {
             Student student=studentDao.findStudentByStudentId(studentId);
-            if(student.getStudentAvaibility()==StudentAvaibility.NOT_AVAILABLE){
-                return new ResponseEntity<>("You cant Apply Because You are working on project",HttpStatus.CONFLICT);
-            }
             if(student==null){
                 return new ResponseEntity<>("Student is not found",HttpStatus.NOT_FOUND);
             }
+            if(student.getStudentAvaibility()==StudentAvaibility.NOT_AVAILABLE){
+                return new ResponseEntity<>("You cant Apply Because You are working on project",HttpStatus.CONFLICT);
+            }
+
             if(studentProjectDao.existsByStudent_StudentIdAndProjectId(studentId,projectId)){
                 return new ResponseEntity<>("Student has already applied for this project",HttpStatus.CONFLICT);
             }

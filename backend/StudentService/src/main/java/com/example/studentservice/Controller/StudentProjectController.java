@@ -36,5 +36,11 @@ public class StudentProjectController {
         return studentProjectService.updateStatus(studentId,projectId);
 
     }
+    @GetMapping("{studentId}/project/{projectId}/status")
+    public ResponseEntity<Boolean>checkApplicationStatus(@PathVariable int studentId,@PathVariable int projectId){
+        return studentProjectService.checkApplicationStatus(studentId,projectId);
+
+    }
+
 
 }
