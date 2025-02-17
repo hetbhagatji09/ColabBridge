@@ -13,6 +13,18 @@ export function AuthProvider({ children }) {
 
   const login = async (username, password) => {
     try {
+      if (username === 'faculty@example.com' && password === 'faculty123') {
+        setUser({
+          id: 3,
+          name: 'Faculty User',
+          email: 'faculty@example.com',
+          role: 'FACULTY',
+        });
+        setToken('dummy-token'); // Set a dummy token
+        navigate('faculty/dashboard');
+        toast.success('Login successful!');
+        return;
+      }
       // Call your Spring Boot API to get the token
       const response = await axios.post('http://localhost:8765/auth/token', {
           username,
@@ -29,22 +41,33 @@ export function AuthProvider({ children }) {
       const userResponse = await axios.get(`http://localhost:8765/auth/user?token=${token}`);
 
       const userData = userResponse.data;
-
+      console.log(userData);
       // Save the user data in the context
-      setUser({
-          id: userData.id,
-          name: userData.name,
-          email: userData.email,
-          role: userData.userRole, // Use the selected role from the UI
-      });
+      
 
-      toast.success('Login successful!');
+      
       // Navigate based on the user's role
-      if (user.role === 'STUDENT') {
+      if (userData.userRole==='STUDENT') {
+        const studentResponse = await axios.get(
+          `http://localhost:8765/STUDENT-SERVICE/students/email/${userData.username}`
+        );
+        Object.assign(userData, studentResponse.data);
+        userData.id = userData.studentId;
+        console.log(userData)
         navigate('student/dashboard');
-      } else if (user.role === 'FACULTY') {
+        toast.success('Login successful!');
+      } else if (userData.userRole === 'FACULTY') {
+        const facultyResponse = await axios.get(
+          `http://localhost:8765/FACULTY-SERVICE/api/faculty/email/${userData.username}`
+        );
+        Object.assign(userData, facultyResponse.data);
+        userData.id = userData.f_id;
+        console.log(userData)
         navigate('faculty/dashboard');
+        toast.success('Login successful!');
       }
+      setUser(userData);
+      
     } catch (error) {
       toast.error('Login failed. Please check your credentials.');
       throw error;
