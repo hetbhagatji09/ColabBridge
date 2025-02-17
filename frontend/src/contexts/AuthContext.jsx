@@ -1,73 +1,68 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import axios from 'axios'; // For making API calls
+import axios from 'axios';
 
 const AuthContext = createContext(undefined);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null); // Store the JWT token
-  const [selectedRole, setSelectedRole] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token') || null); // Load token from storage
   const navigate = useNavigate();
 
-  const login = async (username, password) => {
+  // Function to fetch user data using token
+  const fetchUserData = async (storedToken) => {
     try {
-      if (username === 'faculty@example.com' && password === 'faculty123') {
-        setUser({
-          id: 3,
-          name: 'Faculty User',
-          email: 'faculty@example.com',
-          role: 'FACULTY',
-        });
-        setToken('dummy-token'); // Set a dummy token
-        navigate('faculty/dashboard');
-        toast.success('Login successful!');
-        return;
-      }
-      // Call your Spring Boot API to get the token
-      const response = await axios.post('http://localhost:8765/auth/token', {
-          username,
-          password,
-      });
+      const response = await axios.get(`http://localhost:8765/auth/user?token=${storedToken}`);
+      const userData = response.data;
 
-      // Extract the token from the response
-      const { token } = response.data;
-
-      // Save the token in the context
-      setToken(token);
-
-      // Fetch user details using the token as a query parameter
-      const userResponse = await axios.get(`http://localhost:8765/auth/user?token=${token}`);
-
-      const userData = userResponse.data;
-      console.log(userData);
-      // Save the user data in the context
-      
-
-      
-      // Navigate based on the user's role
-      if (userData.userRole==='STUDENT') {
+      if (userData.userRole === 'STUDENT') {
         const studentResponse = await axios.get(
           `http://localhost:8765/STUDENT-SERVICE/students/email/${userData.username}`
         );
         Object.assign(userData, studentResponse.data);
         userData.id = userData.studentId;
-        console.log(userData)
-        navigate('student/dashboard');
-        toast.success('Login successful!');
       } else if (userData.userRole === 'FACULTY') {
         const facultyResponse = await axios.get(
           `http://localhost:8765/FACULTY-SERVICE/api/faculty/email/${userData.username}`
         );
         Object.assign(userData, facultyResponse.data);
         userData.id = userData.f_id;
-        console.log(userData)
-        navigate('faculty/dashboard');
-        toast.success('Login successful!');
       }
+
       setUser(userData);
-      
+      navigate(userData.userRole === 'STUDENT' ? '/student/dashboard' : '/faculty/dashboard', { replace: true });
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+      logout();
+    }
+  };
+
+  // Validate token on page load
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      axios.get(`http://localhost:8765/auth/validate?token=${storedToken}`)
+        .then(() => {
+          setToken(storedToken);
+          fetchUserData(storedToken);
+        })
+        .catch(() => {
+          logout(); // If token is invalid, clear everything
+        });
+    }
+  }, []);
+
+  const login = async (username, password) => {
+    try {
+      const response = await axios.post('http://localhost:8765/auth/token', { username, password });
+      const newToken = response.data.token;
+
+      localStorage.setItem('token', newToken);
+      setToken(newToken);
+
+      await fetchUserData(newToken);
+      toast.success('Login successful!');
     } catch (error) {
       toast.error('Login failed. Please check your credentials.');
       throw error;
@@ -75,25 +70,15 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    localStorage.removeItem('token');
     setUser(null);
     setToken(null);
-    setSelectedRole(null);
-    navigate('/');
+    navigate('/login');
     toast.success('Logged out successfully');
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        isAuthenticated: !!token, // Use token to check authentication
-        login,
-        logout,
-        selectedRole,
-        setSelectedRole,
-      }}
-    >
+    <AuthContext.Provider value={{ user, token, isAuthenticated: !!token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -101,11 +86,12 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }
+
 // import { createContext, useContext, useState, useEffect } from 'react';
 // import { useNavigate } from 'react-router-dom';
 // import axios from 'axios';
