@@ -18,5 +18,6 @@ public interface ProjectDao extends JpaRepository<Project,Integer> {
 
     @Query("SELECT p FROM Project p WHERE p.status = :status AND p.applicationDeadline <= :thresholdTime")
     List<Project> findExpiredProjects(@Param("status") Status status, @Param("thresholdTime") LocalDateTime thresholdTime);
-
+    @Query("SELECT p FROM Project p where p.faculty.f_id=:facultyId AND p.projectId in :projectIds")
+    List<Project> findByFacultyIdAndProjectIds(int facultyId, List<Integer> projectIds);
 }

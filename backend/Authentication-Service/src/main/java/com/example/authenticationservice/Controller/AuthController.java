@@ -3,6 +3,9 @@ package com.example.authenticationservice.Controller;
 import com.example.authenticationservice.Dto.AuthRequest;
 import com.example.authenticationservice.Model.UserCredential;
 import com.example.authenticationservice.Service.AuthService;
+import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("auth")
 public class AuthController {
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @Autowired
     private AuthService authService;
     @Autowired
@@ -33,6 +38,10 @@ public class AuthController {
     public ResponseEntity<String> updatePassword(@RequestBody UserCredential user){
         return authService.updatePassword(user);
 
+    }
+    @PostConstruct
+    public void init() {
+        logger.info("AuthController Initialized!");
     }
     @PostMapping("token")
     public ResponseEntity<Map<String, String>> getToken(@RequestBody AuthRequest authRequest) {
@@ -64,6 +73,10 @@ public class AuthController {
 
         System.out.println("Hello");
         return authService.getUserdetails(token);
+    }
+    @GetMapping("hello")
+    public String hello(){
+        return "hello world";
     }
 
 }
