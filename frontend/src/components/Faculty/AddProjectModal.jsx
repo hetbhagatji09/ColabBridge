@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Minus } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -7,35 +7,56 @@ const AddProjectModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    status: 'OPEN_FOR_APPLICATIONS',
+    date: new Date().toISOString().split("T")[0],
+    deadline: '',
+    applicationDeadline: '',
+    faculty: '',
     maxStudents: 4,
     technologies: [''],
+    projectType: 'Internal',
+    budget: '',
+    projectUrl: '',
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = 'unset';
+      };
+    }
+  }, [isOpen]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add API call here
     toast.success('Project created successfully!');
     onClose();
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const addTechnology = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       technologies: [...prev.technologies, ''],
     }));
   };
 
   const removeTechnology = (index) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       technologies: prev.technologies.filter((_, i) => i !== index),
     }));
   };
 
   const updateTechnology = (index, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      technologies: prev.technologies.map((tech, i) => 
+      technologies: prev.technologies.map((tech, i) =>
         i === index ? value : tech
       ),
     }));
@@ -44,129 +65,176 @@ const AddProjectModal = ({ isOpen, onClose }) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity" onClick={onClose}>
-              <div className="absolute inset-0 bg-gray-500 dark:bg-gray-900 opacity-75"></div>
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="inline-block w-full max-w-2xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 rounded-lg shadow-xl"
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center bg-black bg-opacity-50"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-2xl w-full relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
             >
-              <div className="absolute right-0 top-0 pr-4 pt-4">
-                <button
-                  onClick={onClose}
-                  className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors"
+              <X className="w-6 h-6" />
+            </button>
+
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              Add New Project
+            </h3>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg"
+                  required
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg"
+                  required
+                />
+              </div>
+
+              {/* Status Dropdown */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Status
+                </label>
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg"
                 >
-                  <X className="w-6 h-6" />
+                  <option value="OPEN_FOR_APPLICATIONS">Open for Applications</option>
+                  <option value="IN_PROGRESS">In Progress</option>
+                  <option value="COMPLETED">Completed</option>
+                </select>
+              </div>
+
+              {/* Dates */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium">Start Date</label>
+                  <input
+                    type="date"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium">Deadline</label>
+                  <input
+                    type="date"
+                    name="deadline"
+                    value={formData.deadline}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+                </div>
+              </div>
+
+              {/* Faculty */}
+              <div>
+                <label className="block text-sm font-medium">Faculty</label>
+                <input
+                  type="text"
+                  name="faculty"
+                  value={formData.faculty}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg"
+                />
+              </div>
+
+              {/* Max Students */}
+              <div>
+                <label className="block text-sm font-medium">Max Students</label>
+                <input
+                  type="number"
+                  name="maxStudents"
+                  value={formData.maxStudents}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg"
+                />
+              </div>
+
+              {/* Technologies */}
+              <div>
+                <label className="block text-sm font-medium">Technologies</label>
+                {formData.technologies.map((tech, index) => (
+                  <div key={index} className="flex items-center space-x-2 mb-2">
+                    <input
+                      type="text"
+                      value={tech}
+                      onChange={(e) => updateTechnology(index, e.target.value)}
+                      className="flex-grow px-4 py-2 border rounded-lg"
+                    />
+                    {index > 0 && (
+                      <button type="button" onClick={() => removeTechnology(index)}>
+                        <Minus className="w-5 h-5 text-red-500" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button type="button" onClick={addTechnology} className="text-blue-600">
+                  <Plus className="w-4 h-4 mr-1" /> Add Technology
                 </button>
               </div>
 
-              <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                  Add New Project
-                </h3>
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Project Title
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.title}
-                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Description
-                    </label>
-                    <textarea
-                      value={formData.description}
-                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                      rows={4}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Maximum Students
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={formData.maxStudents}
-                      onChange={(e) => setFormData(prev => ({ ...prev, maxStudents: parseInt(e.target.value) }))}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Technologies Required
-                      </label>
-                      <button
-                        type="button"
-                        onClick={addTechnology}
-                        className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-                      >
-                        <Plus className="w-5 h-5" />
-                      </button>
-                    </div>
-                    {formData.technologies.map((tech, index) => (
-                      <div key={index} className="flex gap-2 mb-2">
-                        <input
-                          type="text"
-                          value={tech}
-                          onChange={(e) => updateTechnology(index, e.target.value)}
-                          className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="e.g., React, Python, etc."
-                          required
-                        />
-                        {formData.technologies.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeTechnology(index)}
-                            className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                          >
-                            <Minus className="w-5 h-5" />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex justify-end gap-4">
-                    <button
-                      type="button"
-                      onClick={onClose}
-                      className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Create Project
-                    </button>
-                  </div>
-                </form>
+              {/* Budget & Project URL */}
+              <div>
+                <label className="block text-sm font-medium">Budget</label>
+                <input
+                  type="number"
+                  name="budget"
+                  value={formData.budget}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg"
+                />
               </div>
-            </motion.div>
-          </div>
+              <div>
+                <label className="block text-sm font-medium">Project URL</label>
+                <input
+                  type="text"
+                  name="projectUrl"
+                  value={formData.projectUrl}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-end">
+                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+                  Create Project
+                </button>
+              </div>
+            </form>
+          </motion.div>
         </div>
       )}
     </AnimatePresence>

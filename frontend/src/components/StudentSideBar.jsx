@@ -3,12 +3,12 @@ import { motion } from 'framer-motion';
 import { LayoutDashboard, CheckSquare, MessageSquare } from 'lucide-react';
 
 const sidebarItems = [
-  { path: '/faculty/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { path: '/confirmed-projects', icon: CheckSquare, label: 'Student Applications' },
+  { path: '/student/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+//   { path: '/confirmed-projects', icon: CheckSquare, label: 'Student Applications' },
   // { path: '/feedback', icon: MessageSquare, label: 'Feedback' },
 ];
 
-const Sidebar = () => {
+const StudentSidebar = () => {
   return (
     <motion.aside
       initial={{ x: -250 }}
@@ -35,4 +35,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default StudentSidebar;

@@ -1,7 +1,7 @@
 import { Sun, Moon, Bell, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
@@ -42,7 +42,7 @@ const Navbar = () => {
 
             <div className="flex items-center space-x-3">
               <span className="text-sm font-medium dark:text-gray-200">
-                {user?.name}
+                {user?.id}
               </span>
               <motion.button
                 whileHover={{ scale: 1.1 }}
