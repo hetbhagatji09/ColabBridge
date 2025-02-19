@@ -13,4 +13,6 @@ public interface FacultyDao extends JpaRepository<Faculty, Integer> {
 
     @Query("SELECT  COUNT(f) FROM Faculty f")
     Integer findTotalUsers();
+
+    Faculty findByEmail(String email);
 }

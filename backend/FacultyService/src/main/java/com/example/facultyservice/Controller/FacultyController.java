@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("api/faculty")
 public class FacultyController {
@@ -63,6 +64,10 @@ public class FacultyController {
     public ResponseEntity<Integer> getCount(){
         return facultyService.getCount();
 
+    }
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Faculty> getFacultyByEmail(@PathVariable String email){
+        return facultyService.findByEmail(email);
     }
 
 }

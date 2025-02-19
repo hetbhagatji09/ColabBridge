@@ -162,4 +162,14 @@ public class ProjectService {
 
 
     }
+
+    public ResponseEntity<List<Project>> getFacultyProjects(int facultyId, List<Integer> projectIds) {
+        try{
+
+            List<Project> projects=projectDao.findByFacultyIdAndProjectIds(facultyId,projectIds);
+            return new ResponseEntity<>(projects,HttpStatus.OK);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

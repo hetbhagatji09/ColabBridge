@@ -267,4 +267,18 @@ public class FacultyService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public ResponseEntity<Faculty> findByEmail(String email) {
+        try{
+            System.out.println(email);
+            Faculty f=facultyDao.findByEmail(email);
+            if(f==null){
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(f,HttpStatus.OK);
+        }
+        catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

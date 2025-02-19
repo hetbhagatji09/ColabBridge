@@ -73,6 +73,15 @@ public class ProjectController {
     public ResponseEntity<Project> updateProject(@PathVariable int projectId,@RequestBody Project updatedProject){
         return projectService.updateProject(projectId,updatedProject);
     }
+    @GetMapping("byFaculty")
+    public ResponseEntity<List<Project>>getFacultyProjects(
+            @RequestParam int facultyId,
+            @RequestParam List<Integer> projectIds
+    ){
+        return projectService.getFacultyProjects(facultyId,projectIds);
+
+
+    }
 
 
 }
