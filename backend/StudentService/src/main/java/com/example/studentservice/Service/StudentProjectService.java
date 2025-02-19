@@ -113,4 +113,16 @@ public class StudentProjectService {
 
 
     }
+
+    public ResponseEntity<List<Integer>> getAppliedProjectIds() {
+        try{
+            List<Integer>ids=studentProjectDao.findDistinctByProjectId();
+            return new ResponseEntity<>(ids,HttpStatus.OK);
+        }
+        catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+    }
 }

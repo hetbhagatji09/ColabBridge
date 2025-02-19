@@ -3,6 +3,7 @@ package com.example.studentservice.Controller;
 import com.example.studentservice.Model.Student;
 import com.example.studentservice.Model.StudentProject;
 import com.example.studentservice.Service.StudentProjectService;
+import com.example.studentservice.Vo.Project;
 import feign.Param;
 import feign.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,9 @@ public class StudentProjectController {
         return studentProjectService.checkApplicationStatus(studentId,projectId);
 
     }
-
+    @GetMapping("/appliedProjects")
+    public ResponseEntity<List<Integer>> getAppliedProjectIds(){
+        return studentProjectService.getAppliedProjectIds();
+    }
 
 }
