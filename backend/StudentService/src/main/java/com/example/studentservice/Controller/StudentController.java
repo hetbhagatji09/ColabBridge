@@ -88,6 +88,10 @@ public class StudentController {
         return studentService.getCount();
 
     }
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Student> getStudentByEmail(@PathVariable String email){
+        return studentService.findByEmail(email);
+    }
 
 
 

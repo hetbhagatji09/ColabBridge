@@ -365,4 +365,17 @@ public class StudentService {
         }
     }
 
+    public ResponseEntity<Student> findByEmail(String email) {
+        try{
+            System.out.println(email);
+           Student s=studentDao.findByEmail(email);
+           if(s==null){
+               return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+           }
+           return new ResponseEntity<>(s,HttpStatus.OK);
+        }
+        catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
