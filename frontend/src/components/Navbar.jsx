@@ -12,7 +12,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <motion.span 
+            <motion.span
               className="text-xl font-bold text-blue-600 dark:text-blue-400"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -41,9 +41,10 @@ const Navbar = () => {
             </motion.button>
 
             <div className="flex items-center space-x-3">
-              <span className="text-sm font-medium dark:text-gray-200">
-                {user?.id}
-              </span>
+              <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-500 text-white font-semibold text-lg">
+                {user?.name?.charAt(0).toUpperCase()}
+              </div>
+
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
