@@ -41,6 +41,10 @@ public class StudentController {
         return studentService.applyProject(studentId,projectId);
 
     }
+    @PostMapping("withdraw/{studentId}/project/{projectId}")
+    public ResponseEntity<String> withdrawProject(@PathVariable int studentId,@PathVariable int projectId){
+        return studentService.withdrawProject(studentId,projectId);
+    }
     @GetMapping("projects")
     public ResponseEntity<List<Project>> getAllProjects(){
         return studentService.getAllProjets();

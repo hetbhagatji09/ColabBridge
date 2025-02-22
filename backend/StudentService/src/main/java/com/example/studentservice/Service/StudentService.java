@@ -378,4 +378,40 @@ public class StudentService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public ResponseEntity<String> withdrawProject(int studentId, int projectId) {
+        try {
+            // Step 1: Check if the student exists
+            Student student = studentDao.findStudentByStudentId(studentId);
+            if (student == null) {
+                return new ResponseEntity<>("Student not found", HttpStatus.NOT_FOUND);
+            }
+
+            // Step 2: Check if the student has applied for the project
+            StudentProject studentProject = studentProjectDao.findByStudent_StudentIdAndProjectId(studentId, projectId);
+            if (studentProject == null) {
+                return new ResponseEntity<>("You have not applied for this project", HttpStatus.CONFLICT);
+            }
+
+            // Step 3: Check if the project is already approved
+            if (studentProject.getStatus() == Status.APPROVED) {
+                return new ResponseEntity<>("You cannot withdraw from an approved project", HttpStatus.CONFLICT);
+            }
+
+            // Step 4: Remove the student from the project
+            studentProjectDao.delete(studentProject);
+
+            // Step 5: Send notification to faculty about the withdrawal
+            String url = FACULTY_SERVICE_URL + "/notify";
+            NotificationRequest notificationRequest = new NotificationRequest(projectId, student);
+            restTemplate.postForEntity(url, notificationRequest, String.class);
+
+            return new ResponseEntity<>("Project application withdrawn successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred: " + e.getMessage());
+            e.printStackTrace();
+            return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
