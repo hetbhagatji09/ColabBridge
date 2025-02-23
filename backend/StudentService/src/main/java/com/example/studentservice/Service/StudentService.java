@@ -83,10 +83,10 @@ public class StudentService {
                     UserCredential user = new UserCredential();
 
                     // Roll Number
-                    Cell rollCell = row.getCell(0);
-                    if (rollCell != null && rollCell.getCellType() == CellType.NUMERIC) {
-                        student.setRoll_no((int) Math.round(rollCell.getNumericCellValue()));
-                    }
+//                    Cell rollCell = row.getCell(0);
+//                    if (rollCell != null && rollCell.getCellType() == CellType.NUMERIC) {
+//                        student.setRoll_no((int) Math.round(rollCell.getNumericCellValue()));
+//                    }
 
                     // Student Name
                     Cell nameCell = row.getCell(1);
@@ -414,4 +414,33 @@ public class StudentService {
         }
     }
 
+    public ResponseEntity<Student> findStudent(int studentId) {
+        try{
+            Optional<Student>student=studentDao.findById(studentId);
+            if(student.isPresent()){
+                Student s=student.get();
+                return new ResponseEntity<>(s,HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return null;
+    }
+
+    public ResponseEntity<Student> updateStudentDetails(int studentId, Student updateStudent) {
+        try{
+            Optional<Student>existStudent=studentDao.findById(studentId);
+            if(existStudent.isPresent()){
+                Student student=existStudent.get();
+                student.setGithubProfileLink(updateStudent.getGithubProfileLink());
+                student.setSkills(updateStudent.getSkills());
+                studentDao.save(student);
+                return new ResponseEntity<>(student,HttpStatus.OK);
+            }
+        }
+        catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return null;
+    }
 }
