@@ -96,6 +96,12 @@ public class StudentController {
     public ResponseEntity<Student> getStudentByEmail(@PathVariable String email){
         return studentService.findByEmail(email);
     }
+    @PutMapping("/student/{studentId}")
+    public ResponseEntity<Student> updateDetails(@PathVariable int studentId,@RequestBody Student student){
+
+        return studentService.updateStudentDetails(studentId,student);
+
+    }
 
 
 
