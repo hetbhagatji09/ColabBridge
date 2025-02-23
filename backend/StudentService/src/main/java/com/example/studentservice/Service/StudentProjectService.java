@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentProjectService {
@@ -124,5 +125,31 @@ public class StudentProjectService {
         }
 
 
+    }
+
+    public ResponseEntity<Integer> getApprovedProject(int studentId) {
+        try{
+            List<StudentProject> projects=studentProjectDao.findByStudent_StudentId(studentId);
+            for(StudentProject p:projects){
+                if(p.getStatus()==Status.APPROVED){
+                    return new ResponseEntity<>(p.getProjectId(),HttpStatus.OK);
+                }
+            }
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return null;
+    }
+
+    public ResponseEntity<List<Integer>> getApliedProjectsIds(int studentId) {
+        try{
+            System.out.println("Yes I am here bro ");
+            List<Integer> projectIds=studentProjectDao.findProjectIdsByStudent_StudentId(studentId);
+            return new ResponseEntity<>(projectIds,HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

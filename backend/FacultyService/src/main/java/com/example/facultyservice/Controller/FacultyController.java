@@ -4,6 +4,7 @@ import com.example.facultyservice.Model.Faculty;
 import com.example.facultyservice.Model.Project;
 import com.example.facultyservice.Model.Student;
 import com.example.facultyservice.Service.FacultyService;
+import com.example.facultyservice.Service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,8 @@ public class FacultyController {
 
     @Autowired
     private FacultyService facultyService;
+    @Autowired
+    private ProjectService projectService;
 
     @PostMapping("register")
     public ResponseEntity<Faculty> registerFaculty(@RequestBody Faculty faculty) {
@@ -68,6 +71,11 @@ public class FacultyController {
     @GetMapping("/email/{email}")
     public ResponseEntity<Faculty> getFacultyByEmail(@PathVariable String email){
         return facultyService.findByEmail(email);
+    }
+    @PostMapping("/projectsbyIds")
+    public ResponseEntity<List<Project>> getProjectsByIds(@RequestBody List<Integer> projectIds){
+        return projectService.getProjectsByIds(projectIds);
+
     }
 
 }

@@ -172,4 +172,14 @@ public class ProjectService {
             throw new RuntimeException(e);
         }
     }
+
+    public ResponseEntity<List<Project>> getProjectsByIds(List<Integer> projectIds) {
+        try {
+            List<Project>projects=projectDao.findByProjectIds(projectIds);
+            return new ResponseEntity<>(projects,HttpStatus.OK);
+        }
+        catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
