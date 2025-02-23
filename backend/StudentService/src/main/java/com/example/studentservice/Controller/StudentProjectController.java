@@ -46,5 +46,15 @@ public class StudentProjectController {
     public ResponseEntity<List<Integer>> getAppliedProjectIds(){
         return studentProjectService.getAppliedProjectIds();
     }
+    @GetMapping("approvedProject/{studentId}")
+    public ResponseEntity<Integer> getApprovedProject(@PathVariable int studentId){
+        return studentProjectService.getApprovedProject(studentId);
+
+    }
+    @GetMapping("appliedProject/{studentId}")
+    public ResponseEntity<List<Integer>> getAppliedProjectsIds(@PathVariable int studentId){
+        System.out.println("Are you there");;
+        return studentProjectService.getApliedProjectsIds(studentId);
+    }
 
 }
