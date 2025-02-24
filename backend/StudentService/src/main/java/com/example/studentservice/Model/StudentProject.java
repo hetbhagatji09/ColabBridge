@@ -26,4 +26,6 @@ public class StudentProject {
     private Status status;
     @Column(name="application_date")
     private LocalDate applicationDate;
+    @Column(name="preference")
+    private int preference;  // New field for ranking
 }

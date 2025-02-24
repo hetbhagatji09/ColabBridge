@@ -191,21 +191,18 @@ public class StudentService {
             if(project.getStatus()==Status.APPROVED){
                 new ResponseEntity<>("Student is aleready registered",HttpStatus.CONFLICT);
             }
+            //get Highest preference
+            Integer maxPreferenced=studentProjectDao.findMaxPreferenceByStudentId(studentId);
+            int newPrefernce=(maxPreferenced==null)?1:maxPreferenced+1;
             StudentProject studentProject=new StudentProject();
             studentProject.setStudent(student);
             studentProject.setStatus(Status.PENDING);
             studentProject.setProjectId(projectId);
             studentProject.setApplicationDate(LocalDate.now());
+            studentProject.setPreference(newPrefernce);
             studentProjectDao.save(studentProject);
 
             System.out.println("Fetched Project: " + project);
-
-
-
-
-            String url = FACULTY_SERVICE_URL + "/notify";
-            NotificationRequest notificationRequest = new NotificationRequest(projectId, student);
-            restTemplate.postForEntity(url, notificationRequest, String.class);
 
 
             return new ResponseEntity<>("Project applied successfully", HttpStatus.OK);

@@ -27,4 +27,6 @@ public interface StudentProjectDao extends JpaRepository<StudentProject,Integer>
 
     @Query("SELECT sp.projectId FROM StudentProject sp where sp.student.studentId= :studentId")
     List<Integer> findProjectIdsByStudent_StudentId(@Param("studentId") int studentId);
+    @Query("SELECT  MAX(sp.preference) FROM  StudentProject sp where sp.student.studentId=:studentId")
+    Integer findMaxPreferenceByStudentId(@Param("studentId") int studentId);
 }
