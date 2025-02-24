@@ -56,5 +56,13 @@ public class StudentProjectController {
         System.out.println("Are you there");;
         return studentProjectService.getApliedProjectsIds(studentId);
     }
+    @PatchMapping("updatePreference/{studentId}/project/{projectId}/{newPreference}")
+    public ResponseEntity<String> updateProjectPreference(@PathVariable int studentId,@PathVariable int projectId,@PathVariable int newPreference) {
+        return studentProjectService.updateProjectPrefernce(studentId,projectId,newPreference);
+    }
+    @GetMapping("projectIdsByPref/{studentId}")
+    public ResponseEntity<List<Integer>>getProjectIdsByPref(@PathVariable int studentId){
+        return studentProjectService.getProjIdsByPref(studentId);
+    }
 
 }

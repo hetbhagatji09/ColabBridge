@@ -152,4 +152,55 @@ public class StudentProjectService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public ResponseEntity<String> updateProjectPrefernce(int studentId, int projectId, int newPreference) {
+        try{
+            List<StudentProject> appliedProjects=studentProjectDao.findProjectsByStudentOrdered(studentId);
+            StudentProject targetProject=appliedProjects.stream().
+                    filter(p->p.getProjectId()==projectId).
+                    findFirst().
+                    orElse(null);
+            if(targetProject==null){
+                return new ResponseEntity<>("Project not found for this tudent",HttpStatus.NOT_FOUND);
+
+            }
+            int oldPreference=targetProject.getPreference();
+            if(oldPreference==newPreference){
+                return new ResponseEntity<>("Preference is aleready set",HttpStatus.OK);
+            }
+            if(newPreference<oldPreference){
+                appliedProjects.forEach(p->{
+                    if(p.getPreference() >= newPreference && p.getPreference()<oldPreference){
+                        p.setPreference(p.getPreference()+1);
+                    }
+                });
+            }
+            else{
+                appliedProjects.forEach(p->{
+                    if(p.getPreference() <=newPreference && p.getPreference()>oldPreference){
+                        p.setPreference(p.getPreference()-1);
+                    }
+                });
+            }
+            targetProject.setPreference(newPreference);
+            studentProjectDao.saveAll(appliedProjects);
+            return new ResponseEntity<>("Project prefrence updated",HttpStatus.OK);
+
+        }
+        catch(Exception e){
+            return  new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<List<Integer>> getProjIdsByPref(int studentId) {
+        try{
+            List<Integer>projectIds=studentProjectDao.findProjectIdsByStudentOrdered(studentId);
+            if(projectIds==null){
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(projectIds,HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
