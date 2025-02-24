@@ -14,11 +14,18 @@ import ProjectDetailsPage from './components/Faculty/ProjectDetailsPage';
 import Home from './pages/Home';
 import StudentProjectCard from './components/StudentProjectCard';
 import StudentDetail from './components/Faculty/StudentDetail';
+import { useEffect } from 'react';
+import AssignProjects from './components/Faculty/AssignProjects';
+import CurrentProject from './components/CurrentProject';
+import StudentProfile from './components/StudentProfile';
+import StudentFacultyProfile from './components/Faculty/StudentFacultyProfile';
+import AppliedProjects from './components/Student/AppliedProjects';
 // Protected Route wrapper component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
+
 
 function App() {
   return (
@@ -46,6 +53,12 @@ function App() {
                 <Route path="project/:id" element={<ProjectDetails />} />
                 <Route path="confirmed-projects" element={<ConfirmedProjects />} />
                 <Route path="feedback" element={<Feedback />} />
+                <Route path="/assigned-projects" element={<AssignProjects/>}/>
+                <Route path="/current-project" element={<CurrentProject/>}/>
+                
+                <Route path="/user/profile/:studentId" element={<StudentProfile />} />
+                <Route path='/student/profile/:studentId' element={<StudentFacultyProfile/>}/>
+                <Route path="/applied-projects" element={<AppliedProjects/>}/>
               </Route>
             </Routes>
           </AnimatePresence>
