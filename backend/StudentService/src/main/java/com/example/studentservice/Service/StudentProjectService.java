@@ -203,4 +203,22 @@ public class StudentProjectService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public ResponseEntity<StudentProject> findProjectByProjIdAndStudId(int projectId, int studentId) {
+        try{
+            StudentProject studentProject=studentProjectDao.findByStudent_StudentIdAndProjectId(studentId,projectId);
+            return new ResponseEntity<>(studentProject,HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<List<StudentProject>> findProjectByProjIdAndStudIds(int projectId, List<Integer> studentIds) {
+        try{
+           List<StudentProject> studentProjects=studentProjectDao.findByProjectIdAndStudent_StudentIdIn(projectId,studentIds);
+           return new ResponseEntity<>(studentProjects,HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

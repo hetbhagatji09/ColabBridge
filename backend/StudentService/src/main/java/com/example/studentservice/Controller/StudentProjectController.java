@@ -64,5 +64,14 @@ public class StudentProjectController {
     public ResponseEntity<List<Integer>>getProjectIdsByPref(@PathVariable int studentId){
         return studentProjectService.getProjIdsByPref(studentId);
     }
+    @GetMapping("{projectId}/student/{studentId}")
+    public ResponseEntity<StudentProject>getStudentProject(@PathVariable int projectId,@PathVariable int studentId){
+        return studentProjectService.findProjectByProjIdAndStudId(projectId,studentId);
+    }
+    @PostMapping("{projectId}/student")
+    public ResponseEntity<List<StudentProject>>getStudentProjectByIds(@PathVariable int projectId,@RequestBody List<Integer> studentIds){
+        return studentProjectService.findProjectByProjIdAndStudIds(projectId,studentIds);
+    }
+
 
 }
