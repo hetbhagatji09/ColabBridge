@@ -8,19 +8,32 @@ import toast from 'react-hot-toast';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await login(email, password);
     } catch (error) {
       // Error is handled in AuthContext
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex relative">
+      {loading && (
+        <motion.div 
+          initial={{ width: 0 }}
+          animate={{ width: '100%' }}
+          transition={{ duration: 1.5, ease: 'easeInOut' }}
+          className="absolute top-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500"
+        />
+      )}
+      
       {/* Left Section - Hero/Welcome */}
       <div className="hidden lg:flex lg:w-1/2 relative">
         <div 
@@ -52,15 +65,6 @@ const Login = () => {
               Connect with faculty members and work on innovative projects that shape your future.
             </p>
           </div>
-
-          <div className="space-y-4">
-            {/* <p className="text-white/80 font-medium">Trusted by leading universities worldwide</p> */}
-            <div className="flex gap-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="w-12 h-12 rounded-full bg-white/10 animate-pulse" />
-              ))}
-            </div>
-          </div>
         </div>
       </div>
 
@@ -71,17 +75,6 @@ const Login = () => {
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md"
         >
-          <div className="lg:hidden flex items-center justify-between mb-8">
-            <Link to="/" className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
-              <ArrowLeft className="h-5 w-5" />
-              Back
-            </Link>
-            <div className="flex items-center">
-              <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400 mr-2" />
-              <Star className="h-6 w-6 text-yellow-500 animate-pulse" />
-            </div>
-          </div>
-
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -100,7 +93,7 @@ const Login = () => {
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
-                    type="email"
+                    type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -132,8 +125,9 @@ const Login = () => {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform"
+                disabled={loading}
               >
-                Sign In
+                {loading ? 'Signing In...' : 'Sign In'}
               </motion.button>
             </form>
           </div>
