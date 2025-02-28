@@ -1,17 +1,18 @@
-package com.example.facultyservice.Dto;
+package com.example.facultyservice.Model;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import com.example.facultyservice.Dto.NotificationType;
+import com.example.facultyservice.Dto.ReceiverType;
+import com.example.facultyservice.Dto.SenderType;
+import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
-@Data
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class NotificationRequest {
-    private int notificationId;
+import java.util.UUID;
+
+
+public class Notification {
+    private UUID id;
+
     @Enumerated(EnumType.STRING)
     private SenderType senderType;
     private String senderId;
@@ -26,4 +27,5 @@ public class NotificationRequest {
 //    @Column(name = "metadata", columnDefinition = "jsonb")
 //    @Convert(converter = JsonConverter.class)
 //    private Map<String, Object> metadata; // Dynamic metadata field
+
 }
