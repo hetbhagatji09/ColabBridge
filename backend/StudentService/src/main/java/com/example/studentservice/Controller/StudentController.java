@@ -81,6 +81,10 @@ public class StudentController {
         return studentService.getAllStudentsById(ids);
 
     }
+    @GetMapping("ids")
+    public ResponseEntity<List<Student>>getStudentsByIds(@RequestBody List<Integer>ids){
+        return studentService.getAllStudentsById(ids);
+    }
     @PutMapping("available/{projectId}")
     public ResponseEntity<String> updateStudentsAvailable(@PathVariable int projectId){
         System.out.println("Hy Path" );
@@ -101,6 +105,21 @@ public class StudentController {
 
         return studentService.updateStudentDetails(studentId,student);
 
+    }
+    @GetMapping("all")
+    public ResponseEntity<List<Student>> getAllFaculties(){
+        return studentService.findAll();
+    }
+    @PutMapping("/student/{studentId}/avtar")
+    public ResponseEntity<Student> updateDetails(
+            @PathVariable int studentId,
+            @RequestParam("image") MultipartFile avtar){
+
+        return studentService.editAvtar(studentId,avtar);
+    }
+    @PostMapping(value = "student/{studentId}/upload-image")
+    public ResponseEntity<Student> uploadImage(@RequestParam("image") MultipartFile image,@PathVariable int studentId) {
+        return studentService.uploadImageToCloudinary(image,studentId);
     }
 
 

@@ -39,6 +39,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StudentService {
     @Autowired
+    private CloudinaryService cloudinaryService;
+    @Autowired
     private RestTemplate restTemplate;
     @Autowired
     private AuthInterface authInterface;
@@ -52,6 +54,7 @@ public class StudentService {
 
     public ResponseEntity<Student> registerStudent(Student student) {
         try{
+
                 return new ResponseEntity<>(studentDao.save(student), HttpStatus.OK);
             }
             catch(Exception e) {
@@ -395,13 +398,24 @@ public class StudentService {
                 return new ResponseEntity<>("You cannot withdraw from an approved project", HttpStatus.CONFLICT);
             }
 
+            // Get the preference of the withdrawn project
+            int withdrawnPreference = studentProject.getPreference();
+
             // Step 4: Remove the student from the project
             studentProjectDao.delete(studentProject);
 
-            // Step 5: Send notification to faculty about the withdrawal
-            String url = FACULTY_SERVICE_URL + "/notify";
-            NotificationRequest notificationRequest = new NotificationRequest(projectId, student);
-            restTemplate.postForEntity(url, notificationRequest, String.class);
+            // Step 5: Update preferences for remaining projects
+            List<StudentProject> remainingProjects = studentProjectDao.findByStudent_StudentId(studentId);
+
+            for (StudentProject project : remainingProjects) {
+                if (project.getPreference() > withdrawnPreference) {
+                    project.setPreference(project.getPreference() - 1);
+                    studentProjectDao.save(project);  // Save updated preference
+                }
+            }
+
+            // Step 6: Send notification to faculty about the withdrawal
+
 
             return new ResponseEntity<>("Project application withdrawn successfully", HttpStatus.OK);
         } catch (Exception e) {
@@ -410,6 +424,7 @@ public class StudentService {
             return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     public ResponseEntity<Student> findStudent(int studentId) {
         try{
@@ -431,6 +446,10 @@ public class StudentService {
                 Student student=existStudent.get();
                 student.setGithubProfileLink(updateStudent.getGithubProfileLink());
                 student.setSkills(updateStudent.getSkills());
+                student.setSemesterNo(updateStudent.getSemesterNo());
+                student.setCgpa(updateStudent.getCgpa());
+                student.setBio(updateStudent.getBio());
+                student.setLinkedInUrl(updateStudent.getLinkedInUrl());
                 studentDao.save(student);
                 return new ResponseEntity<>(student,HttpStatus.OK);
             }
@@ -439,5 +458,50 @@ public class StudentService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return null;
+    }
+
+    public ResponseEntity<List<Student>> findAll() {
+        try{
+            List<Student> students=studentDao.findAll();
+            return new ResponseEntity<>(students,HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<Student> editAvtar(int studentId, MultipartFile avtar) {
+        try {
+            Optional<Student> existStudent = studentDao.findById(studentId);
+            if (existStudent.isPresent()) {
+                Student student = existStudent.get();
+                student.setImageUrl(cloudinaryService.uploadFile(avtar));
+
+                studentDao.save(student);
+                return new ResponseEntity<>(student, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<Student> uploadImageToCloudinary(MultipartFile image,int studentId) {
+        try{
+            String fileUrl=cloudinaryService.uploadFile(image);
+            Optional<Student> existStudent=studentDao.findById(studentId);
+            Student student=null;
+            if(existStudent.isPresent()){
+                student=existStudent.get();
+                student.setImageUrl(fileUrl);
+                studentDao.save(student);
+
+            }
+            return new ResponseEntity<>(student,HttpStatus.OK);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

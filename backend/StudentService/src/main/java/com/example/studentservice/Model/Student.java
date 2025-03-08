@@ -1,5 +1,6 @@
 package com.example.studentservice.Model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,12 +20,21 @@ public class Student {
     private String name;
     @Column(unique = true)
     private String email;
-    private int roll_no;
     private String githubProfileLink;
     private List<String>Skills=new ArrayList<>();
     @Enumerated(EnumType.STRING)
     private StudentAvaibility studentAvaibility=StudentAvaibility.AVAILABLE;
+    @Nullable
     private float ratings=0;
+    @Nullable
+    private String bio;
+    private Float cgpa;
+    @Nullable
+    private Integer semesterNo;
+    @Nullable
+    private String imageUrl;
+    @Nullable
+    private String linkedInUrl;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "student_id")
     private List<PersonalProject> projects = new ArrayList<>();
