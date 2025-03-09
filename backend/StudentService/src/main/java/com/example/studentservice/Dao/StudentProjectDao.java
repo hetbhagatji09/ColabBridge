@@ -1,12 +1,14 @@
 package com.example.studentservice.Dao;
 
 import com.example.studentservice.Model.StudentProject;
+import com.example.studentservice.Vo.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface StudentProjectDao extends JpaRepository<StudentProject,Integer> {
@@ -36,4 +38,10 @@ public interface StudentProjectDao extends JpaRepository<StudentProject,Integer>
 
 
     List<StudentProject> findByProjectIdAndStudent_StudentIdIn(int projectId, List<Integer> studentIds);
+
+    @Query("SELECT sp.student.studentId FROM StudentProject sp WHERE sp.projectId = :projectId AND sp.status = 'APPROVED'")
+    List<Integer> findStudentIdByApproved(@Param("projectId") int projectId);
+
+    @Query("SELECT sp.projectId FROM StudentProject sp WHERE sp.student.studentId = :studentId AND sp.status = :status")
+    Optional<List<Integer>> findProjectIdByStudent_StudentIdAndStatus(int studentId, Status status);
 }

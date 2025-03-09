@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentProjectService {
@@ -220,5 +221,45 @@ public class StudentProjectService {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public ResponseEntity<List<Integer>> getApprovedStudentsByProjectId(int projectId) {
+        try{
+            List<Integer> studentIds=studentProjectDao.findStudentIdByApproved(projectId);
+            return new ResponseEntity<>(studentIds,HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<List<Integer>> getStudentPendingApprovals(int studentId) {
+        try{
+            Optional<List<Integer>> studentProjects=studentProjectDao.findProjectIdByStudent_StudentIdAndStatus(studentId,Status.PENDING);
+            if(studentProjects.isPresent()){
+                return new ResponseEntity<>(studentProjects.get(),HttpStatus.OK);
+            }
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return null;
+    }
+
+    public ResponseEntity<List<Integer>> getFacultiesByProject(int studentId,int projectId) {
+        try{
+            Optional<List<Integer>> studentProjects=studentProjectDao.findProjectIdByStudent_StudentIdAndStatus(studentId,Status.PENDING);
+            if(studentProjects.isPresent()){
+               List<Integer> projectIds=studentProjects.get().
+                       stream().
+                       filter(p->!p.equals(projectId)).
+                       collect(Collectors.toList());
+                System.out.println(projectIds);
+
+               return new ResponseEntity<>(projectIds,HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return null;
     }
 }

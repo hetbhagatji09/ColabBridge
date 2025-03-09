@@ -6,6 +6,7 @@ import com.example.studentservice.Service.StudentProjectService;
 import com.example.studentservice.Vo.Project;
 import feign.Param;
 import feign.Response;
+import jakarta.ws.rs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,6 +72,19 @@ public class StudentProjectController {
     @PostMapping("{projectId}/student")
     public ResponseEntity<List<StudentProject>>getStudentProjectByIds(@PathVariable int projectId,@RequestBody List<Integer> studentIds){
         return studentProjectService.findProjectByProjIdAndStudIds(projectId,studentIds);
+    }
+    @GetMapping("{projectId}/aprovedStudents")
+    public ResponseEntity<List<Integer>> getApprovedStudentsByProjectId(@PathVariable int projectId){
+        return studentProjectService.getApprovedStudentsByProjectId(projectId);
+
+    }
+    @GetMapping("{studentId}/pendingApprovals")
+    public ResponseEntity<List<Integer>> getStudentPendingApprovals(@PathVariable int studentId){
+        return studentProjectService.getStudentPendingApprovals(studentId);
+    }
+    @GetMapping("{studentId}/getProjectFaculties/project/{projectId}")
+    public ResponseEntity<List<Integer>> geIdsOfFacultiesByProject(@PathVariable int studentId,@PathVariable int projectId){
+        return studentProjectService.getFacultiesByProject(studentId,projectId);
     }
 
 
