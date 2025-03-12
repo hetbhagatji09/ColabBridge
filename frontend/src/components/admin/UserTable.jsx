@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Edit, Trash, ChevronDown, ChevronUp } from 'lucide-react';
+import { Edit, Trash, ChevronDown, ChevronUp, Star } from 'lucide-react';
 import axios from 'axios';
 
 const UserTable = ({ userType, searchQuery, onUpdatePassword, onDeleteUser }) => {
@@ -73,6 +73,36 @@ const UserTable = ({ userType, searchQuery, onUpdatePassword, onDeleteUser }) =>
     return skills.join(', ');
   };
 
+  // Render star rating component
+  const StarRating = ({ rating }) => {
+    if (!rating) return <span>Not rated</span>;
+    
+    const ratingValue = parseFloat(rating);
+    const fullStars = Math.floor(ratingValue);
+    const hasHalfStar = ratingValue - fullStars >= 0.5;
+    const maxStars = 5;
+    
+    return (
+      <div className="flex items-center">
+        {[...Array(maxStars)].map((_, index) => {
+          // Render filled star
+          if (index < fullStars) {
+            return <Star key={index} className="h-4 w-4 fill-yellow-400 text-yellow-400" />;
+          } 
+          // Render half star (we'll use a filled star with reduced opacity for simplicity)
+          else if (index === fullStars && hasHalfStar) {
+            return <Star key={index} className="h-4 w-4 fill-yellow-400 text-yellow-400 opacity-50" />;
+          }
+          // Render empty star
+          return <Star key={index} className="h-4 w-4 text-gray-300 dark:text-gray-600" />;
+        })}
+        <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
+          {ratingValue.toFixed(1)}
+        </span>
+      </div>
+    );
+  };
+
   if (loading) {
     return <div className="text-center py-8">Loading {userType}...</div>;
   }
@@ -119,14 +149,6 @@ const UserTable = ({ userType, searchQuery, onUpdatePassword, onDeleteUser }) =>
                       {getSortIcon('githubProfileLink')}
                     </div>
                   </th>
-                  {/* <th 
-                    scope="col" 
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                  >
-                    <div className="flex items-center space-x-1">
-                      <span>Skills</span>
-                    </div>
-                  </th> */}
                   <th 
                     scope="col" 
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
@@ -190,14 +212,9 @@ const UserTable = ({ userType, searchQuery, onUpdatePassword, onDeleteUser }) =>
                         ) : 'No GitHub profile'}
                       </div>
                     </td>
-                    {/* <td className="px-6 py-4">
-                      <div className="text-sm text-gray-500 dark:text-gray-300">
-                        {formatSkills(user.skills)}
-                      </div>
-                    </td> */}
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500 dark:text-gray-300">
-                        {user.ratings ? user.ratings.toFixed(1) : 'Not rated'}
+                      <div className="text-sm">
+                        <StarRating rating={user.ratings} />
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
