@@ -25,7 +25,7 @@ public class FacultyController {
     @Autowired
     private ProjectService projectService;
 
-    @PostMapping("register")
+    @PostMapping("/register")
     public ResponseEntity<Faculty> registerFaculty(@RequestBody Faculty faculty) {
         return facultyService.registerFaculty(faculty);
     }
@@ -78,4 +78,12 @@ public class FacultyController {
 
     }
 
+    @GetMapping("all")
+    public ResponseEntity<List<Faculty>> getAllFaculties() {
+        return facultyService.findAll();
+    }
+    @GetMapping("approvedProject")
+    public ResponseEntity<Integer> getTotalApprovedProjects(){
+        return facultyService.getTotalApprovedProjects();
+    }
 }

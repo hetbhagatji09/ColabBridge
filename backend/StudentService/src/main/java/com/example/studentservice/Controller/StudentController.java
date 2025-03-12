@@ -30,6 +30,7 @@ public class StudentController {
 
     @PostMapping("register")
     public ResponseEntity<Student> registerStudent(@RequestBody Student student) {
+        System.out.println("Gonna register controller");
         return studentService.registerStudent(student);
     }
     @PostMapping("registerFile")

@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -98,7 +99,11 @@ public class FacultyService {
                     }
             );
             List<Student> students = responseEntity.getBody();
-            return new ResponseEntity<>(students, HttpStatus.OK);
+            List<Student> availableStudents = students.stream()
+                    .filter(s -> s.getStudentAvaibility() == StudentAvaibility.AVAILABLE)
+                    .collect(Collectors.toList());
+
+            return new ResponseEntity<>(availableStudents, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -278,6 +283,28 @@ public class FacultyService {
             return new ResponseEntity<>(f,HttpStatus.OK);
         }
         catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<List<Faculty>> findAll() {
+        try{
+            List<Faculty> faculties=facultyDao.findAll();
+            return new ResponseEntity<>(faculties,HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<Integer> getTotalApprovedProjects() {
+        try{
+            Optional<Integer> existCount=projectDao.findTotalApprovedProjects();
+            int count=0;
+            if(existCount.isPresent()){
+                count=existCount.get();
+            }
+            return new ResponseEntity<>(count,HttpStatus.OK);
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
