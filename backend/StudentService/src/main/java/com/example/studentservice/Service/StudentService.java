@@ -450,6 +450,7 @@ public class StudentService {
                 student.setCgpa(updateStudent.getCgpa());
                 student.setBio(updateStudent.getBio());
                 student.setLinkedInUrl(updateStudent.getLinkedInUrl());
+                student.setPhoneNo(updateStudent.getPhoneNo());
                 studentDao.save(student);
                 return new ResponseEntity<>(student,HttpStatus.OK);
             }

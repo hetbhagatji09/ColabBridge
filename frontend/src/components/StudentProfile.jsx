@@ -15,11 +15,12 @@ import {
   CircleDot,
   Pencil,
   X,
+  Phone,
   Save,
   Loader2,
 } from 'lucide-react';
 import {
-  SiReact, SiJavascript, SiTypescript, SiNodedotjs, SiPython, SiCplusplus, 
+  SiReact, SiJavascript, SiTypescript, SiNodedotjs, SiPython, SiCplusplus,
   SiTensorflow, SiGooglecloud, SiFigma, SiAndroid, SiDevpost, SiDatabricks
 } from "react-icons/si";
 
@@ -51,11 +52,10 @@ function StarRating({ rating }) {
       {[1, 2, 3, 4, 5].map((star) => (
         <Star
           key={star}
-          className={`w-4 h-4 ${
-            star <= rating
-              ? "fill-yellow-400 text-yellow-400"
-              : "text-gray-300"
-          }`}
+          className={`w-4 h-4 ${star <= rating
+            ? "fill-yellow-400 text-yellow-400"
+            : "text-gray-300"
+            }`}
         />
       ))}
     </div>
@@ -75,6 +75,14 @@ function StudentProfile() {
     linkedInUrl: "",
     cgpa: "",
     semesterNo: "",
+    phoneNo: "",
+  });
+  const [isAddingProject, setIsAddingProject] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState(null);
+  const [projectFormData, setProjectFormData] = useState({
+    name: "",
+    descreption: "", // Note: This matches your API field name with the typo
+    projectLink: ""
   });
 
   // Fetch student data
@@ -96,6 +104,7 @@ function StudentProfile() {
           linkedInUrl: data.linkedInUrl || "",
           cgpa: data.cgpa || "",
           semesterNo: data.semesterNo || "",
+          phoneNo: data.phoneNo || "",
         });
       } catch (error) {
         console.error("Error fetching student data:", error);
@@ -117,7 +126,7 @@ function StudentProfile() {
     try {
       const studentId = studentData.studentId;
       const response = await axios.post(
-        `http://localhost:8765/STUDENT-SERVICE/students/student/${studentId}/upload-image`, 
+        `http://localhost:8765/STUDENT-SERVICE/students/student/${studentId}/upload-image`,
         formData,
         {
           headers: {
@@ -171,7 +180,7 @@ function StudentProfile() {
           email: studentData.email,
         }
       );
-      
+
       setStudentData(prev => ({
         ...prev,
         ...response.data
@@ -193,6 +202,7 @@ function StudentProfile() {
       linkedInUrl: studentData.linkedInUrl || "",
       cgpa: studentData.cgpa || "",
       semesterNo: studentData.semesterNo || "",
+      phoneNo: studentData.phoneNo || "",
     });
   };
 
@@ -206,13 +216,117 @@ function StudentProfile() {
       </div>
     );
   }
+  // Add this after other API functions like handleSubmit, handleCancel, etc.
+
+  const handleAddProject = async (projectData) => {
+    try {
+      const studentId = studentData.studentId;
+      const response = await axios.post(
+        `http://localhost:8765/STUDENT-SERVICE/api/personalProject/${studentId}`,
+        projectData
+      );
+
+      // Update local student data with the new project
+      setStudentData(prev => ({
+        ...prev,
+        projects: [...(prev.projects || []), response.data]
+      }));
+
+      return response.data;
+    } catch (error) {
+      console.error("Error adding project:", error);
+      throw error;
+    }
+  };
+
+  const handleUpdateProject = async (projectId, projectData) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:8765/STUDENT-SERVICE/api/personalProject/${projectId}`,
+        projectData
+      );
+
+      // Update local student data with the updated project
+      setStudentData(prev => ({
+        ...prev,
+        projects: prev.projects.map(p =>
+          p.personalProjectId === projectId ? response.data : p
+        )
+      }));
+
+      return response.data;
+    } catch (error) {
+      console.error("Error updating project:", error);
+      throw error;
+    }
+  };
+
+  const handleDeleteProject = async (projectId) => {
+    try {
+      await axios.delete(
+        `http://localhost:8765/STUDENT-SERVICE/api/personalProject/${projectId}`
+      );
+
+      // Remove project from local student data
+      setStudentData(prev => ({
+        ...prev,
+        projects: prev.projects.filter(p => p.personalProjectId !== projectId)
+      }));
+
+      return true;
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      throw error;
+    }
+  };
+  const handleProjectInputChange = (e) => {
+    const { name, value } = e.target;
+    setProjectFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleProjectFormSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      if (editingProjectId) {
+        await handleUpdateProject(editingProjectId, projectFormData);
+      } else {
+        await handleAddProject(projectFormData);
+      }
+
+      // Reset form and state
+      setProjectFormData({ name: "", descreption: "", projectLink: "" });
+      setIsAddingProject(false);
+      setEditingProjectId(null);
+    } catch (error) {
+      console.error("Failed to save project:", error);
+    }
+  };
+
+  const startEditingProject = (project) => {
+    setProjectFormData({
+      name: project.name || "",
+      descreption: project.descreption || "",
+      projectLink: project.projectLink || ""
+    });
+    setEditingProjectId(project.personalProjectId);
+    setIsAddingProject(true);
+  };
+
+  const cancelProjectForm = () => {
+    setProjectFormData({ name: "", descreption: "", projectLink: "" });
+    setIsAddingProject(false);
+    setEditingProjectId(null);
+  };
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
       <div className="container mx-auto px-4 py-8">
-        <div className={`max-w-4xl mx-auto rounded-xl shadow-lg overflow-hidden ${
-          isDarkMode ? 'bg-gray-800' : 'bg-white'
-        }`}>
+        <div className={`max-w-4xl mx-auto rounded-xl shadow-lg overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'
+          }`}>
           {/* Header Section */}
           <div className="relative h-32 bg-gradient-to-r from-blue-500 to-purple-600">
             {/* <button
@@ -287,17 +401,17 @@ function StudentProfile() {
                         value={formData.githubProfileLink}
                         onChange={handleInputChange}
                         placeholder="https://github.com/yourusername"
-                        className={`w-full pl-10 pr-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
-                          isDarkMode 
-                            ? 'bg-gray-700 border-gray-600 text-white' 
-                            : 'bg-white border-gray-200 text-gray-900'
-                        }`}
+                        className={`w-full pl-10 pr-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${isDarkMode
+                          ? 'bg-gray-700 border-gray-600 text-white'
+                          : 'bg-white border-gray-200 text-gray-900'
+                          }`}
                       />
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <Github className="h-5 w-5 text-gray-400" />
                       </div>
                     </div>
                   </div>
+
 
                   <div>
                     <label className="block text-sm font-medium mb-2">
@@ -309,11 +423,10 @@ function StudentProfile() {
                         value={formData.linkedInUrl}
                         onChange={handleInputChange}
                         placeholder="https://linkedin.com/in/yourusername"
-                        className={`w-full pl-10 pr-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
-                          isDarkMode 
-                            ? 'bg-gray-700 border-gray-600 text-white' 
-                            : 'bg-white border-gray-200 text-gray-900'
-                        }`}
+                        className={`w-full pl-10 pr-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${isDarkMode
+                          ? 'bg-gray-700 border-gray-600 text-white'
+                          : 'bg-white border-gray-200 text-gray-900'
+                          }`}
                       />
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <Linkedin className="h-5 w-5 text-gray-400" />
@@ -334,11 +447,10 @@ function StudentProfile() {
                       value={formData.cgpa}
                       onChange={handleInputChange}
                       placeholder="Enter your CGPA"
-                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
-                        isDarkMode 
-                          ? 'bg-gray-700 border-gray-600 text-white' 
-                          : 'bg-white border-gray-200 text-gray-900'
-                      }`}
+                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${isDarkMode
+                        ? 'bg-gray-700 border-gray-600 text-white'
+                        : 'bg-white border-gray-200 text-gray-900'
+                        }`}
                     />
                   </div>
 
@@ -354,13 +466,31 @@ function StudentProfile() {
                       value={formData.semesterNo}
                       onChange={handleInputChange}
                       placeholder="Current semester"
-                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
-                        isDarkMode 
-                          ? 'bg-gray-700 border-gray-600 text-white' 
-                          : 'bg-white border-gray-200 text-gray-900'
-                      }`}
+                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${isDarkMode
+                        ? 'bg-gray-700 border-gray-600 text-white'
+                        : 'bg-white border-gray-200 text-gray-900'
+                        }`}
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Phone Number
+                    </label>
+                    <input
+                      name="phoneNo"
+                      type="tel"
+                      pattern="[0-9]{10}"
+                      value={formData.phoneNo}
+                      onChange={handleInputChange}
+                      placeholder="Enter your phone number"
+                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${isDarkMode
+                        ? 'bg-gray-700 border-gray-600 text-white'
+                        : 'bg-white border-gray-200 text-gray-900'
+                        }`}
+                    />
+                  </div>
+
+
 
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium mb-2">
@@ -372,11 +502,10 @@ function StudentProfile() {
                       onChange={handleInputChange}
                       rows={4}
                       placeholder="Tell us about yourself, your interests, and your career goals..."
-                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none resize-none ${
-                        isDarkMode 
-                          ? 'bg-gray-700 border-gray-600 text-white' 
-                          : 'bg-white border-gray-200 text-gray-900'
-                      }`}
+                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none resize-none ${isDarkMode
+                        ? 'bg-gray-700 border-gray-600 text-white'
+                        : 'bg-white border-gray-200 text-gray-900'
+                        }`}
                     />
                   </div>
                 </div>
@@ -390,15 +519,14 @@ function StudentProfile() {
                     {availableSkills.map(({ name, icon }) => (
                       <label
                         key={name}
-                        className={`flex items-center space-x-3 p-3 rounded-lg border transition-all cursor-pointer ${
-                          formData.skills.includes(name)
-                            ? isDarkMode
-                              ? "border-blue-700 bg-blue-900/30"
-                              : "border-blue-300 bg-blue-50"
-                            : isDarkMode
-                              ? "border-gray-700 hover:border-gray-600"
-                              : "border-gray-200 hover:border-gray-300"
-                        }`}
+                        className={`flex items-center space-x-3 p-3 rounded-lg border transition-all cursor-pointer ${formData.skills.includes(name)
+                          ? isDarkMode
+                            ? "border-blue-700 bg-blue-900/30"
+                            : "border-blue-300 bg-blue-50"
+                          : isDarkMode
+                            ? "border-gray-700 hover:border-gray-600"
+                            : "border-gray-200 hover:border-gray-300"
+                          }`}
                       >
                         <input
                           type="checkbox"
@@ -410,16 +538,15 @@ function StudentProfile() {
                           <div className={`${formData.skills.includes(name) ? "text-blue-500" : "text-gray-400"}`}>
                             {icon}
                           </div>
-                          <span className={`text-sm ${
-                            formData.skills.includes(name) 
-                              ? isDarkMode ? "text-blue-300" : "text-blue-700"
-                              : isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }`}>{name}</span>
+                          <span className={`text-sm ${formData.skills.includes(name)
+                            ? isDarkMode ? "text-blue-300" : "text-blue-700"
+                            : isDarkMode ? "text-gray-300" : "text-gray-700"
+                            }`}>{name}</span>
                         </div>
                         <div className={`ml-auto ${formData.skills.includes(name) ? "opacity-100" : "opacity-0"}`}>
                           <div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center">
                             <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M1 4L3 6L7 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M1 4L3 6L7 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                           </div>
                         </div>
@@ -433,11 +560,10 @@ function StudentProfile() {
                   <button
                     type="button"
                     onClick={handleCancel}
-                    className={`px-6 py-3 rounded-lg transition-colors flex items-center space-x-2 ${
-                      isDarkMode
-                        ? "text-gray-300 hover:bg-gray-800"
-                        : "text-gray-700 hover:bg-gray-100"
-                    }`}
+                    className={`px-6 py-3 rounded-lg transition-colors flex items-center space-x-2 ${isDarkMode
+                      ? "text-gray-300 hover:bg-gray-800"
+                      : "text-gray-700 hover:bg-gray-100"
+                      }`}
                   >
                     <X className="w-4 h-4" />
                     <span>Cancel</span>
@@ -447,6 +573,7 @@ function StudentProfile() {
                     disabled={isSaving}
                     className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                   >
+
                     {isSaving ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -475,11 +602,14 @@ function StudentProfile() {
                   <Mail className="w-4 h-4" />
                   <span>{studentData.email}</span>
                 </div>
+                <div className="flex items-center justify-center gap-2 mt-2">
+                  <Phone className="w-4 h-4" />
+                  <span>{studentData.phoneNo}</span>
+                </div>
+
+
                 <div className="mt-2 flex items-center justify-center gap-4">
-                  <div className="flex items-center gap-1">
-                    <CircleDot className={`w-4 h-4 ${studentData.studentAvaibility === 'AVAILABLE' ? 'text-green-500' : 'text-red-500'}`} />
-                    <span>{studentData.studentAvaibility === 'AVAILABLE' ? 'Available' : 'Not Available'}</span>
-                  </div>
+
                   {studentData.ratings > 0 && (
                     <div className="flex items-center gap-1">
                       <StarRating rating={studentData.ratings} />
@@ -490,9 +620,8 @@ function StudentProfile() {
               </div>
 
               {/* Academic Info */}
-              <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg mb-6 ${
-                isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
-              }`}>
+              <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg mb-6 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
+                }`}>
                 {studentData.cgpa && (
                   <div className="flex items-center gap-2">
                     <GraduationCap className="w-5 h-5 text-blue-500" />
@@ -506,6 +635,8 @@ function StudentProfile() {
                   </div>
                 )}
               </div>
+
+
 
               {/* Bio */}
               {studentData.bio && (
@@ -557,11 +688,10 @@ function StudentProfile() {
                     {studentData.skills.map((skill) => (
                       <div
                         key={skill}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg ${
-                          isDarkMode
-                            ? 'bg-gray-700 text-white'
-                            : 'bg-blue-100 text-blue-800'
-                        }`}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg ${isDarkMode
+                          ? 'bg-gray-700 text-white'
+                          : 'bg-blue-100 text-blue-800'
+                          }`}
                       >
                         {skillIcons[skill] || null}
                         <span>{skill}</span>
@@ -569,47 +699,152 @@ function StudentProfile() {
                     ))}
                   </div>
                 ) : (
-                  <div className={`p-4 text-center rounded-lg border border-dashed ${
-                    isDarkMode ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'
-                  }`}>
+                  <div className={`p-4 text-center rounded-lg border border-dashed ${isDarkMode ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'
+                    }`}>
                     No skills added yet.
                   </div>
                 )}
               </div>
 
+
               {/* Projects */}
-              {studentData.projects && studentData.projects.length > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-4">
+              {/* Projects Section */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
                     <LinkIcon className="w-5 h-5 text-blue-500" />
                     <h2 className="text-xl font-semibold">Projects</h2>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {studentData.projects.map((project) => (
+                  <button
+                    onClick={() => {
+                      setIsAddingProject(true);
+                      setEditingProjectId(null);
+                      setProjectFormData({ name: "", descreption: "", projectLink: "" });
+                    }}
+                    className="flex items-center gap-1 text-sm px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                  >
+                    <CircleDot className="w-4 h-4" />
+                    Add Project
+                  </button>
+                </div>
+
+                {isAddingProject ? (
+                  <div className={`p-5 rounded-lg mb-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <form onSubmit={handleProjectFormSubmit} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Project Name</label>
+                        <input
+                          name="name"
+                          value={projectFormData.name}
+                          onChange={handleProjectInputChange}
+                          placeholder="Project Name"
+                          required
+                          className={`w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
+                            }`}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Description</label>
+                        <textarea
+                          name="descreption"
+                          value={projectFormData.descreption}
+                          onChange={handleProjectInputChange}
+                          placeholder="Project Description"
+                          required
+                          rows={3}
+                          className={`w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none resize-none ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
+                            }`}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Project Link</label>
+                        <input
+                          name="projectLink"
+                          value={projectFormData.projectLink}
+                          onChange={handleProjectInputChange}
+                          placeholder="https://github.com/yourusername/project"
+                          className={`w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
+                            }`}
+                        />
+                      </div>
+
+                      <div className="flex gap-3 pt-2">
+                        <button
+                          type="button"
+                          onClick={cancelProjectForm}
+                          className={`px-4 py-2 rounded-lg transition ${isDarkMode ? 'bg-gray-600 hover:bg-gray-700 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                            }`}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                        >
+                          {editingProjectId ? 'Update Project' : 'Add Project'}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                ) : null}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {studentData.projects && studentData.projects.length > 0 ? (
+                    studentData.projects.map((project) => (
                       <div
-                        key={project.name}
-                        className={`p-4 rounded-lg ${
-                          isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
-                        }`}
+                        key={project.personalProjectId}
+                        className={`p-5 rounded-lg border transition-all relative group ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200 hover:shadow-md'
+                          }`}
                       >
-                        <h3 className="font-semibold mb-2">{project.name}</h3>
-                        <p className="text-sm mb-3">{project.description}</p>
-                        {project.link && (
-                          <a
-                            href={project.link}
+                        <h3 className="font-semibold text-lg mb-2">{project.name}</h3>
+                        <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          {project.descreption}
+                        </p>
+
+                        {project.projectLink && (
+
+                          <a href={project.projectLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-500 hover:text-blue-600 text-sm flex items-center gap-1"
+                            className="text-blue-500 hover:text-blue-600 inline-flex items-center gap-1 text-sm"
                           >
-                            <LinkIcon className="w-4 h-4" />
+                            <Github className="w-4 h-4" />
                             View Project
                           </a>
                         )}
+
+                        {/* Actions */}
+                        <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => startEditingProject(project)}
+                            className="p-1.5 rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
+                            title="Edit Project"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProject(project.personalProjectId)}
+                            className="p-1.5 rounded-full bg-red-100 text-red-700 hover:bg-red-200 transition"
+                            title="Delete Project"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
-                    ))}
-                  </div>
+                    ))
+                  ) : (
+                    <div className={`col-span-full p-8 text-center rounded-lg border border-dashed ${isDarkMode ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'
+                      }`}>
+                      <LinkIcon className="w-10 h-10 mx-auto mb-3 opacity-40" />
+                      <p>No projects added yet.</p>
+                      <p className="text-sm mt-1">Showcase your work by adding projects to your profile.</p>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+
             </div>
           )}
         </div>
