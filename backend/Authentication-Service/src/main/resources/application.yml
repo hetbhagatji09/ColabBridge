@@ -1,8 +1,27 @@
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: https://service-registry-production-97f5.up.railway.app/eureka
-#    register-with-eureka: true
-#    fetch-registry: true
-#  instance:
-#    prefer-ip-address: true
+eureka:
+  client:
+    service-url:
+      defaultZone: https://service-registry-production-97f5.up.railway.app/eureka  # Eureka Server URL
+    register-with-eureka: true  # Register with Eureka
+    fetch-registry: true  # Fetch other services from Eureka
+
+  instance:
+    prefer-ip-address: false  # Uses hostname instead of IP
+    hostname: auth-service-production-97f5.up.railway.app  # Public hostname of Authentication Service
+    instance-id: auth-service-production-97f5.up.railway.app:8070  # Unique ID for Eureka registration
+    non-secure-port: 80  # Allow HTTP requests (if needed)
+    secure-port: 443  # Allow HTTPS requests
+    secure-port-enabled: true  # Enable secure port (HTTPS)
+    non-secure-port-enabled: false  # Disable non-secure port (HTTP)
+    home-page-url: https://auth-service-production-97f5.up.railway.app/  # Service homepage
+    status-page-url: https://auth-service-production-97f5.up.railway.app/actuator/info  # Actuator info URL
+    health-check-url: https://auth-service-production-97f5.up.railway.app/actuator/health  # Health check URL
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info  # Expose health and info endpoints
+  endpoint:
+    health:
+      show-details: always  # Show detailed health status
