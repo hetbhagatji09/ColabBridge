@@ -35,10 +35,10 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
-#    register-with-eureka: true
-#    fetch-registry: true
-#  instance:
-#    prefer-ip-address: true
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
 #,https://delightful-victory-production.up.railway.app/eureka/,http://localhost:8761/eureka/
 #server:
 #  port: 8765
