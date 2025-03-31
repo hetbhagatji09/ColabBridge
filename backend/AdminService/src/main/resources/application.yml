@@ -1,10 +1,27 @@
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: https://service-registry-production-97f5.up.railway.app/eureka
-#    register-with-eureka: true
-#    fetch-registry: true
-#  instance:
-#    prefer-ip-address: true
 
-#http://localhost:8761/eureka/
+eureka:
+  client:
+    service-url:
+      defaultZone: https://service-registry-production-97f5.up.railway.app/eureka
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: false
+    hostname: admin-service-production-ccd2.up.railway.app
+    instance-id: admin-service-production-ccd2.up.railway.app:8080
+    non-secure-port: 80
+    secure-port: 443
+    secure-port-enabled: true
+    non-secure-port-enabled: false
+    home-page-url: admin-service-production-ccd2.up.railway.app/
+    status-page-url: admin-service-production-ccd2.up.railway.app/actuator/info
+    health-check-url: admin-service-production-ccd2.up.railway.app/actuator/health
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
