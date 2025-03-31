@@ -6,7 +6,9 @@ import com.example.studentservice.Model.Student;
 import com.example.studentservice.Dao.PersonalProjectDao;
 import com.example.studentservice.Dao.StudentDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,26 +26,27 @@ public class PersonalProjectService {
     // ✅ Create a new personal project
     public PersonalProjectDTO createPersonalProject(PersonalProjectDTO dto, int studentId) {
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found"));
 
         PersonalProject project = new PersonalProject();
         project.setName(dto.getName());
-        project.setDescreption(dto.getDescreption());
+        project.setDescription(dto.getDescription());
         project.setProjectLink(dto.getProjectLink());
         project.setStudent(student);
 
         PersonalProject savedProject = personalProjectRepository.save(project);
 
         return new PersonalProjectDTO(savedProject.getPersonalProjectId(), savedProject.getName(),
-                savedProject.getDescreption(), savedProject.getProjectLink());
+                savedProject.getDescription(), savedProject.getProjectLink());
     }
+
 
     // ✅ Get all personal projects for a student
     public List<PersonalProjectDTO> getAllPersonalProjects(int studentId) {
         List<PersonalProject> projects = personalProjectRepository.findByStudent_StudentId(studentId);
 
         return projects.stream().map(project -> new PersonalProjectDTO(
-                        project.getPersonalProjectId(), project.getName(), project.getDescreption(), project.getProjectLink()))
+                        project.getPersonalProjectId(), project.getName(), project.getDescription(), project.getProjectLink()))
                 .collect(Collectors.toList());
     }
 
@@ -53,7 +56,7 @@ public class PersonalProjectService {
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
         return new PersonalProjectDTO(project.getPersonalProjectId(), project.getName(),
-                project.getDescreption(), project.getProjectLink());
+                project.getDescription(), project.getProjectLink());
     }
 
     // ✅ Update a personal project
@@ -62,13 +65,13 @@ public class PersonalProjectService {
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
         project.setName(dto.getName());
-        project.setDescreption(dto.getDescreption());
+        project.setDescription(dto.getDescription());
         project.setProjectLink(dto.getProjectLink());
 
         PersonalProject updatedProject = personalProjectRepository.save(project);
 
         return new PersonalProjectDTO(updatedProject.getPersonalProjectId(), updatedProject.getName(),
-                updatedProject.getDescreption(), updatedProject.getProjectLink());
+                updatedProject.getDescription(), updatedProject.getProjectLink());
     }
 
     // ✅ Delete a personal project

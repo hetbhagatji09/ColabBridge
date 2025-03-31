@@ -11,6 +11,6 @@ import lombok.*;
 public class PersonalProjectDTO {
     private int personalProjectId;
     private String name;
-    private String descreption;
+    private String description;
     private String projectLink;
 }
