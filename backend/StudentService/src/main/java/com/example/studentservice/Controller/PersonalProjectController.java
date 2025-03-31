@@ -3,8 +3,10 @@ package com.example.studentservice.Controller;
 import com.example.studentservice.Vo.PersonalProjectDTO;
 import com.example.studentservice.Service.PersonalProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -15,11 +17,17 @@ public class PersonalProjectController {
     @Autowired
     private PersonalProjectService personalProjectService;
 
-    // ✅ Create a new personal project for a student
     @PostMapping("/{studentId}")
-    public ResponseEntity<PersonalProjectDTO> createPersonalProject(
+    public ResponseEntity<?> createPersonalProject(
             @RequestBody PersonalProjectDTO personalProjectDTO, @PathVariable int studentId) {
-        return ResponseEntity.ok(personalProjectService.createPersonalProject(personalProjectDTO, studentId));
+        try {
+            PersonalProjectDTO savedProject = personalProjectService.createPersonalProject(personalProjectDTO, studentId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedProject);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
+        }
     }
 
     // ✅ Get all personal projects for a student

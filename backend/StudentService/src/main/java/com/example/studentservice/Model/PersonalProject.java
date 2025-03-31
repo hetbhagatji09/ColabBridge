@@ -17,7 +17,8 @@ public class PersonalProject {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int personalProjectId;
     private String name;
-    private String descreption;
+    private String description;
+
     private String projectLink;
     @ManyToOne
     private Student student;
