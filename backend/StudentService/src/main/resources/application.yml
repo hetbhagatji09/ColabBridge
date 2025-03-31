@@ -1,8 +1,27 @@
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: https://service-registry-production-97f5.up.railway.app/eureka
-#    register-with-eureka: true
-#    fetch-registry: true
-#  instance:
-#    prefer-ip-address: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: https://service-registry-production-97f5.up.railway.app/eureka
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: false
+    hostname: student-service-production-ad5e.up.railway.app
+    instance-id: student-service-production-ad5e.up.railway.app:8080
+    non-secure-port: 80
+    secure-port: 443
+    secure-port-enabled: true
+    non-secure-port-enabled: false
+    home-page-url: student-service-production-ad5e.up.railway.app/
+    status-page-url: https://student-service-production-ad5e.up.railway.app/actuator/info
+    health-check-url: https://student-service-production-ad5e.up.railway.app/actuator/health
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
