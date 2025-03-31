@@ -1,8 +1,33 @@
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: https://service-registry-production-97f5.up.railway.app/eureka
-#    register-with-eureka: true
-#    fetch-registry: true
-#  instance:
-#    prefer-ip-address: true
+server:
+  port: 8080
+
+spring:
+  application:
+    name: FACULTY-SERVICE
+
+eureka:
+  client:
+    service-url:
+      defaultZone: https://service-registry-production-97f5.up.railway.app/eureka
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: false
+    hostname: faculty-service-production.up.railway.app
+    instance-id: faculty-service-production.up.railway.app:8080
+    non-secure-port: 80
+    secure-port: 443
+    secure-port-enabled: true
+    non-secure-port-enabled: false
+    home-page-url: https://faculty-service-production.up.railway.app/
+    status-page-url: https://faculty-service-production.up.railway.app/actuator/info
+    health-check-url: https://faculty-service-production.up.railway.app/actuator/health
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
