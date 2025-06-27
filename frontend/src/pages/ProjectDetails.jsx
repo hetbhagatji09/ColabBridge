@@ -47,31 +47,38 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     if (!project || !project.applicationDeadline) return;
-
+    
     const appDeadline = new Date(project.applicationDeadline).getTime();
+    let timerInterval; // Declare timerInterval before using it
+    
     const updateTimer = () => {
       const now = new Date().getTime();
       const timeDiff = appDeadline - now;
-
+      
       if (timeDiff <= 0) {
         setTimeRemaining('Application deadline has passed');
-        clearInterval(timerInterval);
+        // Still display the project, just show deadline passed
+        if (timerInterval) {
+          clearInterval(timerInterval);
+        }
         return;
       }
-
+      
       const totalHours = Math.floor(timeDiff / (1000 * 60 * 60));
       const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-
       setTimeRemaining(`${totalHours}h ${minutes}m ${seconds}s remaining`);
     };
-
+    
     updateTimer();
-    const timerInterval = setInterval(updateTimer, 1000);
-
-    return () => clearInterval(timerInterval);
+    timerInterval = setInterval(updateTimer, 1000);
+    
+    return () => {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+    };
   }, [project]);
-
   useEffect(() => {
     const checkApplicationStatus = async () => {
       try {

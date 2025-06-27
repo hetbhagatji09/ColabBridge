@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Select from 'react-select';
@@ -64,6 +64,38 @@ const initialState = {
 const AddProjectForm = ({ onBack }) => {
   const { user } = useAuth();
   const [project, setProject] = useState(initialState);
+  const [minProjectDeadline, setMinProjectDeadline] = useState('');
+  const [maxApplicationDeadline, setMaxApplicationDeadline] = useState('');
+  
+  // Update project deadline min value when application deadline changes
+  useEffect(() => {
+    if (project.applicationDeadline) {
+      setMinProjectDeadline(project.applicationDeadline);
+      
+      // If current project deadline is before application deadline, reset it
+      if (project.deadline && project.deadline < project.applicationDeadline) {
+        setProject(prev => ({ 
+          ...prev,
+          deadline: ''
+        }));
+      }
+    }
+  }, [project.applicationDeadline]);
+
+  // Update application deadline max value when project deadline changes
+  useEffect(() => {
+    if (project.deadline) {
+      setMaxApplicationDeadline(project.deadline);
+      
+      // If current application deadline is after project deadline, reset it
+      if (project.applicationDeadline && project.applicationDeadline > project.deadline) {
+        setProject(prev => ({
+          ...prev,
+          applicationDeadline: ''
+        }));
+      }
+    }
+  }, [project.deadline]);
 
   const handleSkillChange = (selectedOptions) => {
     setProject(prev => ({
@@ -81,10 +113,19 @@ const AddProjectForm = ({ onBack }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Additional validation to ensure project deadline is after application deadline
+    if (new Date(project.deadline) <= new Date(project.applicationDeadline)) {
+      toast.error('Project deadline must be after application deadline');
+      return;
+    }
+    
     try {
       await axios.post(`http://localhost:8765/FACULTY-SERVICE/api/project/${user.id}`, project);
       toast.success('Project created successfully!');
       setProject(initialState);
+      setMinProjectDeadline('');
+      setMaxApplicationDeadline('');
       onBack();
       
       if ('serviceWorker' in navigator) {
@@ -100,6 +141,9 @@ const AddProjectForm = ({ onBack }) => {
       console.error('Error creating project:', error);
     }
   };
+
+  // Format today's date to use as min value
+  const today = new Date().toISOString().slice(0, 16);
 
   return (
     <div className="p-6">
@@ -145,27 +189,34 @@ const AddProjectForm = ({ onBack }) => {
         </div>
 
         <div>
-          <label className="block text-gray-700 dark:text-white">Project Deadline</label>
-          <input
-            type="datetime-local"
-            value={project.deadline}
-            min={new Date().toISOString().slice(0, 16)}
-            onChange={(e) => setProject(prev => ({ ...prev, deadline: e.target.value }))}
-            className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            required
-          />
-        </div>
-
-        <div>
           <label className="block text-gray-700 dark:text-white">Application Deadline</label>
           <input
             type="datetime-local"
             value={project.applicationDeadline}
-            min={new Date().toISOString().slice(0, 16)}
+            min={today}
+            max={maxApplicationDeadline || ""}
             onChange={(e) => setProject(prev => ({ ...prev, applicationDeadline: e.target.value }))}
             className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             required
           />
+          {project.deadline && !project.applicationDeadline && (
+            <p className="text-sm text-gray-500 mt-1">Must be before project deadline</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-gray-700 dark:text-white">Project Deadline</label>
+          <input
+            type="datetime-local"
+            value={project.deadline}
+            min={minProjectDeadline || today}
+            onChange={(e) => setProject(prev => ({ ...prev, deadline: e.target.value }))}
+            className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            required
+          />
+          {project.applicationDeadline && !project.deadline && (
+            <p className="text-sm text-gray-500 mt-1">Must be after application deadline</p>
+          )}
         </div>
 
         <div>

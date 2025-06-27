@@ -504,10 +504,14 @@ public class StudentService {
 
     public ResponseEntity<String> updateScoreByFaculty(int projectId, float ratings) {
         try {
-            ResponseEntity<List<Integer>> studentIdsWithProject = studentProjectService.findStudentIdsByProjectIdAndStatus(projectId, Status.APPROVED);
+            ResponseEntity<List<Integer>> studentIdsWithProject = studentProjectService.findStudentIdsByProjectIdAndStatus(projectId, Status.COMPLETED);
 
             if (studentIdsWithProject.getStatusCode() == HttpStatus.OK) {
                 List<Integer> studentIds = studentIdsWithProject.getBody();
+
+                if (studentIds == null || studentIds.isEmpty()) {
+                    return new ResponseEntity<>("No approved students found for this project", HttpStatus.NOT_FOUND);
+                }
 
                 for (int studentId : studentIds) {
                     Optional<Student> studentOptional = studentDao.findById(studentId);
@@ -515,15 +519,34 @@ public class StudentService {
                     if (studentOptional.isPresent()) {
                         Student student = studentOptional.get();
 
-                        // Handle first rating case safely
-                        int totalRatings = (student.getTotalRatings() != null) ? student.getTotalRatings() : 0;
+                        // Get current values from database
+                        float currentRating = student.getRatings();
+                        int currentTotalRatings = student.getTotalRatings() != null ? student.getTotalRatings() : 0;
 
-                        // Corrected formula for average rating
-                        float newAverageRating = ((student.getRatings() * totalRatings) + ratings) / (totalRatings + 1);
+                        // Debug information
+                        System.out.println("Student ID: " + student.getStudentId());
+                        System.out.println("Current rating: " + currentRating);
+                        System.out.println("Current total ratings: " + currentTotalRatings);
+                        System.out.println("New rating to add: " + ratings);
+
+                        // Calculate new average rating
+                        float newAverageRating;
+                        if (currentTotalRatings == 0) {
+                            // If first rating, just use the new rating
+                            newAverageRating = ratings;
+                        } else {
+                            // Calculate weighted average
+                            float currentTotal = currentRating * currentTotalRatings;
+                            newAverageRating = (currentTotal + ratings) / (currentTotalRatings + 1);
+                        }
+
+                        // Debug new values
+                        System.out.println("New average rating: " + newAverageRating);
+                        System.out.println("New total ratings: " + (currentTotalRatings + 1));
 
                         // Update student record
                         student.setRatings(newAverageRating);
-                        student.setTotalRatings(totalRatings + 1);
+                        student.setTotalRatings(currentTotalRatings + 1);
                         studentDao.save(student);
                     }
                 }
@@ -532,6 +555,8 @@ public class StudentService {
                 return new ResponseEntity<>("Student IDs not found", HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
+            System.err.println("Error updating scores: " + e.getMessage());
+            e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
