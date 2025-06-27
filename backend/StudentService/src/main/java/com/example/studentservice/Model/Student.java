@@ -26,7 +26,6 @@ public class Student {
     private List<String>Skills=new ArrayList<>();
     @Enumerated(EnumType.STRING)
     private StudentAvaibility studentAvaibility=StudentAvaibility.AVAILABLE;
-    @Nullable
     private float ratings=0;
     @Nullable
     private String bio;

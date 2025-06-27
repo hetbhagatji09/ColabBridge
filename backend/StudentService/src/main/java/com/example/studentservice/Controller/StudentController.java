@@ -137,9 +137,5 @@ public class StudentController {
         return studentService.getCompletedProjects(studentId);
     }
 
-
-
-
-
 }
     

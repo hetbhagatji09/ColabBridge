@@ -46,7 +46,7 @@ const ConfirmedProjects = () => {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
       {projects.length > 0 ? (
         projects
-          .filter((project) => project.status !== "APPROVED")
+          .filter((project) => project.status !== "APPROVED" |project.status!== 'COMPLETED')
           .map((project) => (
             <motion.div
               key={project.projectId}

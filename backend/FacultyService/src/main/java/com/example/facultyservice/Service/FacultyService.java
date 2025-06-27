@@ -94,6 +94,7 @@ public class FacultyService {
     public ResponseEntity<String> deleteProject(int p_id) {
         try {
             projectDao.deleteById(p_id);
+
             return new ResponseEntity<>("Project deleted successfully", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

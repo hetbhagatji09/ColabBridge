@@ -19,7 +19,6 @@ import java.util.List;
 @RequestMapping("/api/faculty")
 public class FacultyController {
 
-
     @Autowired
     private FacultyService facultyService;
     @Autowired

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import axios from "axios"
-import { FileText, Users, CheckCircle, AlertTriangle, Award } from "lucide-react"
+import { FileText, Users, CheckCircle, AlertTriangle, Award, Star } from "lucide-react"
 import { Toast } from "../Student/Toast"
 
 export const FacultyProjectReview = () => {
@@ -14,6 +14,7 @@ export const FacultyProjectReview = () => {
   const [isProjectCompleted, setIsProjectCompleted] = useState(false)
   const [toast, setToast] = useState({ show: false, message: "", type: "" })
   const [isCheckingCompletion, setIsCheckingCompletion] = useState(false)
+  const [rating, setRating] = useState(5) // Default rating value
 
   useEffect(() => {
     fetchProjectData()
@@ -85,11 +86,17 @@ export const FacultyProjectReview = () => {
 
   const handleMarkComplete = async () => {
     try {
+      // First mark the project as complete
       await axios.put(`http://localhost:8765/FACULTY-SERVICE/api/project/${projectId}/completed`)
+      
+      // Then assign the same rating to all students
+      await axios.put(`http://localhost:8765/students/STUDENT-SERVICE/projects/${projectId}/ratings/${rating}`)
+      
       setIsProjectCompleted(true)
-      showToast("Project marked as completed successfully.", "success")
+      showToast(`Project marked as completed and all students rated ${rating}/5 successfully.`, "success")
     } catch (error) {
-      showToast("Failed to mark project as complete", "error")
+      showToast("Failed to mark project as complete or assign ratings", "error")
+      console.error("Error completing project:", error)
     }
   }
 
@@ -198,13 +205,38 @@ export const FacultyProjectReview = () => {
                 By marking this project as complete, you'll solidify the collaborative effort between students and faculty, 
                 acknowledging the collective hard work and academic achievement.
               </p>
+              
+              {/* Rating Input Section */}
+              <div className="mt-6 mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-5 w-5 text-yellow-500" />
+                    Assign Team Rating (1-5)
+                  </div>
+                </label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    step="0.5"
+                    value={rating}
+                    onChange={(e) => setRating(parseFloat(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <span className="bg-blue-100 text-blue-800 font-medium px-3 py-1 rounded-md min-w-12 text-center">
+                    {rating}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-gray-500">This rating will be assigned to all team members equally.</p>
+              </div>
 
               <button
                 onClick={handleMarkComplete}
                 className="w-full py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium flex items-center justify-center gap-2"
               >
                 <CheckCircle className="h-5 w-5" />
-                Complete Project Collaboration
+                Complete Project & Assign Ratings
               </button>
             </div>
           </div>
@@ -213,4 +245,3 @@ export const FacultyProjectReview = () => {
     </div>
   )
 }
-
