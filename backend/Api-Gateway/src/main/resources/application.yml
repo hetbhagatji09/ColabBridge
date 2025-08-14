@@ -9,7 +9,6 @@ spring:
     gateway:
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
-        - AuthenticationFilter
       routes:
         - id: authentication-service
           uri: lb://AUTHENTICATION-SERVICE
@@ -30,6 +29,11 @@ spring:
           uri: lb://STUDENT-SERVICE
           predicates:
             - Path=/student/**,/STUDENT-SERVICE/**
+
+        - id: recommendation-service
+          uri: lb://RECOMMENDATION-SERVICE
+          predicates:
+            - Path=/recommendation/**,/RECOMMENDATION-SERVICE/**
 
 eureka:
   client:
