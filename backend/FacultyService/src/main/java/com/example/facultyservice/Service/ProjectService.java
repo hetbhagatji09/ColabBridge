@@ -2,11 +2,9 @@ package com.example.facultyservice.Service;
 
 import com.example.facultyservice.Dao.FacultyDao;
 import com.example.facultyservice.Dao.ProjectDao;
-import com.example.facultyservice.Dto.NotificationRequest;
-import com.example.facultyservice.Dto.NotificationType;
-import com.example.facultyservice.Dto.ReceiverType;
-import com.example.facultyservice.Dto.SenderType;
+import com.example.facultyservice.Dto.*;
 import com.example.facultyservice.Feign.NotificationInterface;
+import com.example.facultyservice.Feign.RecommendationInterface;
 import com.example.facultyservice.Feign.StudentInterface;
 import com.example.facultyservice.Model.Faculty;
 import com.example.facultyservice.Model.Project;
@@ -45,7 +43,8 @@ public class ProjectService {
     private FacultyDao facultyDao;
     @Autowired
     private NotificationInterface notificationInterface;
-
+    @Autowired
+    private RecommendationInterface recommendationInterface;
     public ResponseEntity<Project> createProject(Project project, int facultyId) {
         try {
             Optional<Faculty> optionalFaculty = facultyDao.findById(facultyId);
@@ -61,18 +60,14 @@ public class ProjectService {
             Project savedProject = projectDao.save(project);
             System.out.println(project);
             ResponseEntity<Project> response = new ResponseEntity<>(projectDao.save(project), HttpStatus.OK);
+            String content=project.getTitle() + " " + project.getDescription() + " " + project.getSkills();
+            VectorRequest vectorRequest=new VectorRequest();
+            vectorRequest.setProjectId(project.getProjectId());
+            vectorRequest.setContent(content);
+            System.out.println("COntent is like "+content);
+            recommendationInterface.storeVector(vectorRequest);
 
-//            NotificationRequest notification=new NotificationRequest();
-//            notification.setSenderType(SenderType.FACULTY);
-//            notification.setSenderId(String.valueOf(facultyId));
-//            notification.setReceiverType(ReceiverType.STUDENT);
-//            notification.setReceiverId("ALL"); // Notify all students
-//            notification.setNotificationType(NotificationType.PROJECT_CREATION);
-//            notification.setTitle("New Project Available");
-//            notification.setMessage("A new project '" + project.getTitle() + "' has been posted!");
-////            notification.setSeen(false);
-//
-//            notificationInterface.sendNotification(notification); // 🚀 Feign call to Notification Service
+
             return response;
         } catch (Exception e) {
             System.out.println("Error in ProjectService: " + e.getMessage());
@@ -203,3 +198,14 @@ public class ProjectService {
         }
     }
 }
+//            NotificationRequest notification=new NotificationRequest();
+//            notification.setSenderType(SenderType.FACULTY);
+//            notification.setSenderId(String.valueOf(facultyId));
+//            notification.setReceiverType(ReceiverType.STUDENT);
+//            notification.setReceiverId("ALL"); // Notify all students
+//            notification.setNotificationType(NotificationType.PROJECT_CREATION);
+//            notification.setTitle("New Project Available");
+//            notification.setMessage("A new project '" + project.getTitle() + "' has been posted!");
+////            notification.setSeen(false);
+//
+//            notificationInterface.sendNotification(notification); // 🚀 Feign call to Notification Service

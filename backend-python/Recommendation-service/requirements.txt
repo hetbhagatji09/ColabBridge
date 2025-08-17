@@ -16,4 +16,6 @@ pypdf
 ipykernel
 langchain-core
 pandas
-
+python-dotenv
+pgvector
+langchain-google-genai

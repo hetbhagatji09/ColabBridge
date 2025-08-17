@@ -2,6 +2,7 @@ package com.example.facultyservice.Controller;
 
 import com.example.facultyservice.Dao.ProjectDao;
 import com.example.facultyservice.Dto.NotificationRequest;
+import com.example.facultyservice.Feign.RecommendationInterface;
 import com.example.facultyservice.Model.Project;
 import com.example.facultyservice.Model.Student;
 import com.example.facultyservice.Service.FacultyService;
@@ -21,6 +22,8 @@ public class ProjectController {
     private ProjectService projectService;
     @Autowired
     private FacultyService facultyService;
+    @Autowired
+    private RecommendationInterface recommendationInterface;
 
     @PostMapping("{facultyId}")
     public ResponseEntity<Project> createProject(@PathVariable int facultyId, @RequestBody Project project) {
@@ -72,6 +75,10 @@ public class ProjectController {
         return projectService.getFacultyProjects(facultyId,projectIds);
 
 
+    }
+    @GetMapping("/hellobhai")
+    public String getBhai(){
+        return recommendationInterface.getHello();
     }
 
 
