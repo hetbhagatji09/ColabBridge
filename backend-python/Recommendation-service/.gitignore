@@ -1,2 +1,4 @@
 recommendation-env
 .env
+*/.env
+backend-python/Recommendation-service/.env
