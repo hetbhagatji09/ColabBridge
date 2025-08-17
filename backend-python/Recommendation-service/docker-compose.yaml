@@ -1,0 +1,16 @@
+services:
+  pgvector_db:
+    container_name: recommend
+    image: ankane/pgvector
+    environment:
+      POSTGRES_USER: 'pgvector_user'
+      POSTGRES_PASSWORD: 'pgvector_pass'
+      POSTGRES_DB: 'pgvector_db'
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"  # Host 5433 → Container 5432
+
+volumes:
+  pgvector_data:
