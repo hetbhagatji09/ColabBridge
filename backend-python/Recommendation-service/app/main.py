@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from py_eureka_client import eureka_client
 from app.db import Base, engine, SessionLocal
 from app.routes.project import router as project_router
+from app.routes.student import router as student_router
 app = FastAPI()
 
 # ✅ Initialize DB and insert sample record
@@ -24,3 +25,4 @@ async def startup_event():
     print("✅ Database initialized and sample document inserted.")
 
 app.include_router(project_router)
+app.include_router(student_router)
