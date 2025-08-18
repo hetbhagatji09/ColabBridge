@@ -136,6 +136,10 @@ public class StudentController {
     public ResponseEntity<List<Integer>> getCompletedProjects(@PathVariable int studentId){
         return studentService.getCompletedProjects(studentId);
     }
+    @GetMapping("/recommend/projects/{studentId}")
+    public  ResponseEntity<List<Integer>> getRecommendedProjects(@PathVariable int studentId){
+        return studentService.getRecommendedProjects(studentId);
+    }
 
 
 

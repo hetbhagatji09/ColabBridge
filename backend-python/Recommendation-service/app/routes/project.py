@@ -5,9 +5,10 @@ from dotenv import load_dotenv
 from app.db import get_db
 from sqlalchemy.orm import Session
 from app.models.ProjectVector import ProjectVector
-
+from app.models.StudentVector import StudentVector
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 import requests
+from sqlalchemy import select
 from app.schemas.ProjectVector import VectorRequest
 # from langchain_community.document_loaders import PyPDFLoader
 load_dotenv()
@@ -49,3 +50,26 @@ async def storeVector(req: VectorRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_vec)
     print("Vector is succesfully saved for content like "+ req.content)
+    
+@router.get("/projects/{studentId}")
+def getRecommendationIdsForProject(
+    studentId: int,
+    threshold: float = 0.5,
+    limit: int = 5,
+    db: Session = Depends(get_db)   # ✅ dependency injection
+):
+    # get student embedding
+    student_vec = db.query(StudentVector).filter(StudentVector.studentId == studentId).first()
+    if not student_vec:
+        return []
+
+    # use pgvector distance functions
+    stmt = (
+        select(ProjectVector.projectId)
+        .where(1 - ProjectVector.embedding.cosine_distance(student_vec.embedding) >= threshold)
+        .order_by(ProjectVector.embedding.cosine_distance(student_vec.embedding))
+        .limit(limit)
+    )
+
+    results = db.execute(stmt).scalars().all()
+    return results

@@ -2,8 +2,10 @@ package com.example.studentservice.Service;
 
 import com.example.studentservice.Dao.StudentDao;
 import com.example.studentservice.Dao.StudentProjectDao;
+import com.example.studentservice.Dto.StudentVectorRequest;
 import com.example.studentservice.Feign.AuthInterface;
 import com.example.studentservice.Feign.FacultyInterface;
+import com.example.studentservice.Feign.RecommendationInterface;
 import com.example.studentservice.Model.PersonalProject;
 import com.example.studentservice.Model.StudentAvaibility;
 import com.example.studentservice.Model.StudentProject;
@@ -61,7 +63,8 @@ public class StudentService {
     private StudentProjectService studentProjectService;
     @Autowired
     private FacultyInterface facultyInterface;
-
+    @Autowired
+    private RecommendationInterface recommendationInterface;
 
     public ResponseEntity<Student> registerStudent(Student student) {
         try{
@@ -441,10 +444,15 @@ public class StudentService {
     }
 
     public ResponseEntity<Student> updateStudentDetails(int studentId, Student updateStudent) {
-        try{
-            Optional<Student>existStudent=studentDao.findById(studentId);
-            if(existStudent.isPresent()){
-                Student student=existStudent.get();
+        try {
+            Optional<Student> existStudent = studentDao.findById(studentId);
+            if (existStudent.isPresent()) {
+                Student student = existStudent.get();
+
+                boolean skillsChanged = (student.getSkills() == null && updateStudent.getSkills() != null) ||
+                        (student.getSkills() != null && !student.getSkills().equals(updateStudent.getSkills()));
+
+                // update fields
                 student.setGithubProfileLink(updateStudent.getGithubProfileLink());
                 student.setSkills(updateStudent.getSkills());
                 student.setSemesterNo(updateStudent.getSemesterNo());
@@ -452,15 +460,32 @@ public class StudentService {
                 student.setBio(updateStudent.getBio());
                 student.setLinkedInUrl(updateStudent.getLinkedInUrl());
                 student.setPhoneNo(updateStudent.getPhoneNo());
+
                 studentDao.save(student);
-                return new ResponseEntity<>(student,HttpStatus.OK);
+
+                // 🚀 If skills changed, call Python service (Feign client)
+                if (skillsChanged) {
+                    try {
+                        StudentVectorRequest studentVectorRequest=new StudentVectorRequest();
+                        studentVectorRequest.setStudentId(studentId);
+                        String skills=student.getSkills().toString();
+                        studentVectorRequest.setSkills(skills);
+                        // Feign client call to Python service
+                        recommendationInterface.storeVector(studentVectorRequest);
+                    } catch (Exception e) {
+                        // handle error without breaking student update
+                        System.err.println("Vector service update failed: " + e.getMessage());
+                    }
+                }
+
+                return new ResponseEntity<>(student, HttpStatus.OK);
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
 
     public ResponseEntity<List<Student>> findAll() {
         try{
@@ -548,5 +573,8 @@ public class StudentService {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    public ResponseEntity<List<Integer>> getRecommendedProjects(int studentId) {
+        return recommendationInterface.getRecommendationIdsForProject(studentId);
     }
 }
