@@ -3,6 +3,9 @@ package com.example.facultyservice.Model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @ToString
@@ -11,6 +14,8 @@ import lombok.*;
 public class Student {
     private int studentId;
     private String name;
+    private List<String> Skills=new ArrayList<>();
+    private String bio;
     private String password;
     private String email;
     private int roll_no;
