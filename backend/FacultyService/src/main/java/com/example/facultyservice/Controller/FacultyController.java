@@ -95,4 +95,8 @@ public class FacultyController {
     public ResponseEntity<Boolean> getIsComplete(@PathVariable int projectId){
         return facultyService.getIsComplete(projectId);
     }
+    @GetMapping("team-recommendation/{projectId}")
+    public ResponseEntity<List<Integer>> getRecommendationIdsForTeam(@PathVariable int projectId){
+        return facultyService.getRecommendationIdsForTeamByIds(projectId);
+    }
 }

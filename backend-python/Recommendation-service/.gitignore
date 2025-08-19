@@ -2,3 +2,6 @@ recommendation-env
 .env
 */.env
 backend-python/Recommendation-service/.env
+backend-python/Recommendation-service/app/routes/__pycache__/project.cpython-311.pyc
+backend-python/Recommendation-service/app/schemas/__pycache__/StudentRequest.cpython-311.pyc
+backend-python/Recommendation-service/app/schemas/__pycache__/ProjectRequest.cpython-311.pyc

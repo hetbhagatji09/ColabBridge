@@ -3,7 +3,10 @@ package com.example.facultyservice.Service;
 import com.example.facultyservice.Controller.SheetHandler;
 import com.example.facultyservice.Dao.FacultyDao;
 import com.example.facultyservice.Dao.ProjectDao;
+import com.example.facultyservice.Dto.RecommendationRequest;
+import com.example.facultyservice.Dto.StudentRequest;
 import com.example.facultyservice.Feign.AuthInterface;
+import com.example.facultyservice.Feign.RecommendationInterface;
 import com.example.facultyservice.Feign.StudentInterface;
 import com.example.facultyservice.Model.*;
 import com.example.facultyservice.Vo.UserCredential;
@@ -55,6 +58,8 @@ public class FacultyService {
 //    private final String STUDENT = "http://localhost:8765/STUDENT-SERVICE/students";
     @Autowired
     private StudentInterface studentInterface;
+    @Autowired
+    private RecommendationInterface recommendationInterface;
 
 
     public ResponseEntity<Faculty> registerFaculty(Faculty faculty) {
@@ -329,5 +334,34 @@ public class FacultyService {
         } catch (Exception e) {
             return new ResponseEntity<>(false,HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public ResponseEntity<List<Integer>> getRecommendationIdsForTeamByIds(int projectId) {
+        ResponseEntity<List<Student>>studentsResponse=studentInterface.getStudents(projectId);
+        List<Student> students;
+        if(!studentsResponse.hasBody()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        students=studentsResponse.getBody();
+        List<StudentRequest> studentRequests = students.stream()
+                .map(student -> new StudentRequest(
+                            student.getStudentId(),
+                            student.getSkills(),
+                            student.getRatings()
+                ))
+                .collect(Collectors.toList());
+        RecommendationRequest request = new RecommendationRequest();
+
+        Project project=projectDao.findById(projectId).get();
+        request.setProject(project);
+        request.setStudents(studentRequests);
+        ResponseEntity<List<Integer>> recommendationStudentIds=recommendationInterface.getRecommendationByProjectAndStudent(request);
+        if(!recommendationStudentIds.hasBody()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        List<Integer>recommendIds=recommendationStudentIds.getBody();
+        return new ResponseEntity<>(recommendIds,HttpStatus.OK);
+
+
     }
 }
