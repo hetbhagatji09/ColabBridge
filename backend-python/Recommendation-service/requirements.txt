@@ -19,3 +19,4 @@ pandas
 python-dotenv
 pgvector
 langchain-google-genai
+PyPDF2
