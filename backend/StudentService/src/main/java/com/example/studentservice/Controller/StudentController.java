@@ -136,6 +136,10 @@ public class StudentController {
     public ResponseEntity<List<Integer>> getCompletedProjects(@PathVariable int studentId){
         return studentService.getCompletedProjects(studentId);
     }
+    @PostMapping("{studentId}/upload-resume")
+    public ResponseEntity<Student> uploadResume(@PathVariable int studentId,@RequestParam("resume") MultipartFile resume){
+        return studentService.uploadResume(studentId,resume);
+    }
     @GetMapping("/recommend/projects/{studentId}")
     public  ResponseEntity<List<Integer>> getRecommendedProjects(@PathVariable int studentId){
         return studentService.getRecommendedProjects(studentId);

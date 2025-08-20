@@ -65,7 +65,6 @@ public class StudentService {
     private FacultyInterface facultyInterface;
     @Autowired
     private RecommendationInterface recommendationInterface;
-
     public ResponseEntity<Student> registerStudent(Student student) {
         try{
 
@@ -574,7 +573,16 @@ public class StudentService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    public ResponseEntity<Student> uploadResume(int studentId,MultipartFile resume){
+        Student student=studentDao.findById(studentId).get();
+        String resumeUrl = cloudinaryService.uploadFile(resume);
+        student.setResumeUrl(resumeUrl);
+        studentDao.save(student);
+        return new ResponseEntity<>(student, HttpStatus.OK);
+
+    }
     public ResponseEntity<List<Integer>> getRecommendedProjects(int studentId) {
         return recommendationInterface.getRecommendationIdsForProject(studentId);
     }
+
 }

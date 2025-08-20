@@ -23,5 +23,6 @@ public class Student {
     @Enumerated(EnumType.STRING)
     private StudentAvaibility studentAvaibility=StudentAvaibility.AVAILABLE;
     private float ratings=0;
+    private String resumeUrl;
 
 }

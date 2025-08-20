@@ -42,6 +42,6 @@ public class Student {
     @JoinColumn(name = "student_id")
     private List<PersonalProject> projects = new ArrayList<>();
     private Integer totalRatings=0;
-
+    private String resumeUrl;
 
 }
