@@ -12,7 +12,13 @@ import java.util.List;
 @NoArgsConstructor
 public class StudentRequest {
     private int studentId;
-    private List<String> Skills=new ArrayList<>();
+    private List<String> skills=new ArrayList<>();
     private float ratings=0;
+    private String resumeUrl;
 
+    public StudentRequest(int studentId, List<String> skills, float ratings) {
+        this.studentId = studentId;
+        this.skills = skills;
+        this.ratings = ratings;
+    }
 }
