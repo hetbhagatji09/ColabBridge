@@ -8,11 +8,17 @@ from app.models.ProjectVector import ProjectVector
 from app.models.StudentVector import StudentVector
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 import requests
+from io import BytesIO
 from typing import List
 from sqlalchemy import select
 from app.schemas.StudentRequest import StudentRequest
 from app.schemas.ProjectRequest import ProjectRequest
 from app.schemas.ProjectVector import VectorRequest
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
+from langchain_community.document_loaders import PyPDFLoader, TextLoader
+from app.schemas.SummerizeDto import SummerizeDto
+from PyPDF2 import PdfReader
 # from app.schemas.RecommendationRequest import RecommendationRequest
 # from langchain_community.document_loaders import PyPDFLoader
 load_dotenv()
@@ -126,3 +132,69 @@ def getRecommendationByProjectAndStudent(
     best_students = [sid for sid, _ in recommendations[: project.maxStudents]]
 
     return best_students
+
+@router.post("/summerize")
+async def summerizeByProjectAndResume(dto: SummerizeDto, db: Session = Depends(get_db)):
+    """
+    Summarize student's resume with respect to a project.
+    """
+
+    # 1️⃣ Download resume file from Cloudinary
+    response = requests.get(dto.student.resumeUrl)
+    if response.status_code != 200:
+        return {"error": "Could not fetch resume from Cloudinary"}
+
+    resume_text = ""
+    content_type = response.headers.get("Content-Type", "")
+
+    try:
+        
+
+        if "pdf" in content_type:
+            pdf_reader = PdfReader(BytesIO(response.content))
+            resume_text = " ".join([page.extract_text() or "" for page in pdf_reader.pages])
+
+        elif "text" in content_type or "plain" in content_type:
+            resume_text = response.text
+        else:
+            # fallback for other formats
+            resume_text = response.text
+    except Exception as e:
+        resume_text = "Resume could not be parsed properly."
+
+    # 2️⃣ Prompt Template
+    prompt = PromptTemplate(
+        input_variables=["resume", "project_title", "project_desc", "project_skills"],
+        template="""
+        You are an AI assistant that summarizes student resumes for faculty project recommendations.
+
+        Project:
+        - Title: {project_title}
+        - Description: {project_desc}
+        - Required Skills: {project_skills}
+
+        Student Resume:
+        {resume}
+
+        Task:
+        1. Extract student's **skills, experiences, projects, technologies**.
+        2. Highlight **strengths**.
+        3. Analyze **matching with the given project** (title + description + skills).
+        4. Provide a **concise summary (5–6 sentences)**.
+
+        Output in clear natural language.
+        """
+    )
+
+    chain = LLMChain(llm=model, prompt=prompt)
+
+    # 3️⃣ Run Summarization
+    summary = chain.run({
+        "resume": resume_text[:6000],  # prevent token overflow
+        "project_title": dto.project.title,
+        "project_desc": dto.project.description,
+        "project_skills": ", ".join(dto.project.skills or [])
+    })
+
+    # 4️⃣ Return summary
+    return {"studentId": dto.student.studentId, "summary": summary}

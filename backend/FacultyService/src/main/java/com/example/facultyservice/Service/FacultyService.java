@@ -3,8 +3,7 @@ package com.example.facultyservice.Service;
 import com.example.facultyservice.Controller.SheetHandler;
 import com.example.facultyservice.Dao.FacultyDao;
 import com.example.facultyservice.Dao.ProjectDao;
-import com.example.facultyservice.Dto.RecommendationRequest;
-import com.example.facultyservice.Dto.StudentRequest;
+import com.example.facultyservice.Dto.*;
 import com.example.facultyservice.Feign.AuthInterface;
 import com.example.facultyservice.Feign.RecommendationInterface;
 import com.example.facultyservice.Feign.StudentInterface;
@@ -361,6 +360,34 @@ public class FacultyService {
         }
         List<Integer>recommendIds=recommendationStudentIds.getBody();
         return new ResponseEntity<>(recommendIds,HttpStatus.OK);
+
+
+    }
+
+    public ResponseEntity<StudentSummaryResponse> summerizeStudent(int studentId, int projectId) {
+        ResponseEntity<Student> studentResponseEntity=studentInterface.getStudent(studentId);
+        Student student=null;
+        if(!studentResponseEntity.hasBody()){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        student=studentResponseEntity.getBody();
+
+        StudentRequest studentRequest=new StudentRequest();
+        studentRequest.setStudentId(studentId);
+        studentRequest.setSkills(student.getSkills());
+        studentRequest.setRatings(student.getRatings());
+        studentRequest.setResumeUrl(student.getResumeUrl());
+        ProjectDto projectDto=new ProjectDto();
+        Project project=projectDao.findById(projectId).get();
+        projectDto.setProjectId(projectId);
+        projectDto.setMaxStudents(project.getMaxStudents());
+        projectDto.setDescription(project.getDescription());
+        projectDto.setSkills(project.getSkills());
+        projectDto.setTitle(project.getTitle());
+        SummerizeDto summerizeDto=new SummerizeDto();
+        summerizeDto.setStudent(studentRequest);
+        summerizeDto.setProject(projectDto);
+        return recommendationInterface.summerizeByProjectAndResume(summerizeDto);
 
 
     }

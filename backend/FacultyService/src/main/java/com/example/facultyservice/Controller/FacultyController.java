@@ -1,5 +1,6 @@
 package com.example.facultyservice.Controller;
 
+import com.example.facultyservice.Dto.StudentSummaryResponse;
 import com.example.facultyservice.Model.Faculty;
 import com.example.facultyservice.Model.Project;
 import com.example.facultyservice.Model.Student;
@@ -98,5 +99,9 @@ public class FacultyController {
     @GetMapping("team-recommendation/{projectId}")
     public ResponseEntity<List<Integer>> getRecommendationIdsForTeam(@PathVariable int projectId){
         return facultyService.getRecommendationIdsForTeamByIds(projectId);
+    }
+    @PostMapping("/{projectId}/summerize/{studentId}")
+    public ResponseEntity<StudentSummaryResponse>summerizeStudent(@PathVariable int studentId, @PathVariable int projectId){
+        return facultyService.summerizeStudent(studentId,projectId);
     }
 }
