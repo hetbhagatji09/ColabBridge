@@ -25,5 +25,6 @@ public interface StudentInterface {
     @GetMapping("/students/by-id")
     ResponseEntity<List<Student>> getStudentsById(@RequestParam("ids") List<Integer> ids);
 
-
+    @GetMapping("students/{studentId}")
+    ResponseEntity<Student> getStudent(@PathVariable int studentId);
 }
