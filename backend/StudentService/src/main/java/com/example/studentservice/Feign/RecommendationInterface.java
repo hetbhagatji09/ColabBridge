@@ -1,5 +1,6 @@
 package com.example.studentservice.Feign;
 
+import com.example.studentservice.Dto.StudentResumeDto;
 import com.example.studentservice.Dto.StudentVectorRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -17,4 +18,6 @@ public interface RecommendationInterface {
     void storeVector(@RequestBody StudentVectorRequest request);
     @GetMapping("/recommend/projects/{studentId}")
     ResponseEntity<List<Integer>> getRecommendationIdsForProject(@PathVariable int studentId);
+    @PostMapping("/studentvector/resume")
+    void storeResumeVector(StudentResumeDto studentResumeDto);
 }

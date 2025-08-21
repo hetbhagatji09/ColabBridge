@@ -2,6 +2,7 @@ package com.example.studentservice.Service;
 
 import com.example.studentservice.Dao.StudentDao;
 import com.example.studentservice.Dao.StudentProjectDao;
+import com.example.studentservice.Dto.StudentResumeDto;
 import com.example.studentservice.Dto.StudentVectorRequest;
 import com.example.studentservice.Feign.AuthInterface;
 import com.example.studentservice.Feign.FacultyInterface;
@@ -577,7 +578,11 @@ public class StudentService {
         Student student=studentDao.findById(studentId).get();
         String resumeUrl = cloudinaryService.uploadFile(resume);
         student.setResumeUrl(resumeUrl);
+        StudentResumeDto studentResumeDto=new StudentResumeDto();
+        studentResumeDto.setStudentId(studentId);
+        studentResumeDto.setResumeUrl(resumeUrl);
         studentDao.save(student);
+        recommendationInterface.storeResumeVector(studentResumeDto);
         return new ResponseEntity<>(student, HttpStatus.OK);
 
     }
