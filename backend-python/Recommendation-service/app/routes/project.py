@@ -28,6 +28,7 @@ router=APIRouter(prefix="/recommend",tags=["Project"])
 model = ChatGroq(
     temperature=0.7,
     model_name="llama3-8b-8192"  # You can also try "llama3-8b-8192"
+    
 )
 
 embedding_model = GoogleGenerativeAIEmbeddings(
@@ -121,9 +122,8 @@ def getRecommendationByProjectAndStudent(
         norm_b = sum(b * b for b in student_embedding) ** 0.5
         cosine_sim = dot / (norm_a * norm_b)
 
-        # Weighted score: 70% similarity + 30% rating
-        rating_factor = student.ratings / 5.0  # normalize 1–5 → 0–1
-        score = 0.7 * cosine_sim + 0.3 * rating_factor
+        
+        score =  cosine_sim
 
         recommendations.append((student.studentId, score))
 

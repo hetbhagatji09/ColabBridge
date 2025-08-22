@@ -20,5 +20,6 @@ public class StudentRequest {
         this.studentId = studentId;
         this.skills = skills;
         this.ratings = ratings;
+        this.resumeUrl=null;
     }
 }
