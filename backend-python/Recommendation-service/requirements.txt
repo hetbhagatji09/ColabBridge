@@ -21,3 +21,7 @@ pgvector
 langchain-google-genai
 PyPDF2
 bytesbufio
+torch
+torchvision 
+accelerate
+sentence-transformers
