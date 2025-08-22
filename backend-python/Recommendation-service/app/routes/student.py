@@ -7,11 +7,15 @@ from sqlalchemy.orm import Session
 from app.models.StudentVector import StudentVector
 from app.schemas.StudentResumeDto import StudentResumeDto
 from app.models.ResumeEmbedding import ResumeEmbedding
+from fastapi.responses import JSONResponse
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 import requests
+from langchain_core.output_parsers import JsonOutputParser
 from app.schemas.StudentVectorSchema import StudentUpdateRequest
 import PyPDF2  # ✅ use PyPDF2
-import BytesIO
+from io import BytesIO
+from fastapi import HTTPException
+import json
 # from langchain_community.document_loaders import PyPDFLoader
 load_dotenv()
 from fastapi import APIRouter,Depends
@@ -54,61 +58,100 @@ async def storeVector(req: StudentUpdateRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(student_vec)
 
+
+
 @router.post("/resume")
 async def store_resume_vector(dto: StudentResumeDto, db: Session = Depends(get_db)):
     """
+    API to:
     1. Download resume
-    2. Extract essential details with LLaMA (skills, experiences, projects, tech)
-    3. Convert into embeddings
-    4. Store in DB
+    2. Extract structured metadata using LLaMA
+    3. Create embeddings and store them with metadata in DB
     """
+
     # 1️⃣ Fetch resume
     response = requests.get(dto.resumeUrl)
     if response.status_code != 200:
-        return {"error": "Could not fetch resume"}
+        raise HTTPException(status_code=400, detail="Could not fetch resume")
 
     content_type = response.headers.get("Content-Type", "")
-    resume_text = ""
+    resume_text = extract_text_from_pdf(response.content) if "pdf" in content_type else response.text
 
-    if "pdf" in content_type:
-        resume_text = extract_text_from_pdf(response.content)
-    else:
-        resume_text = response.text  # fallback for .txt/.docx
+    # 2️⃣ Prompt for structured JSON extraction
+    prompt_template = """
+    You are an AI that extracts structured information from student resumes.
+    ⚠️ IMPORTANT: Return ONLY valid JSON. Do not add explanations, markdown, or extra text.
 
-    # 2️⃣ Summarize / Extract essentials using LLaMA
-    prompt = PromptTemplate(
-        input_variables=["resume"],
-        template="""
-        You are an AI that extracts structured information from student resumes.
-        From the following resume, extract only the most relevant details and remove the stop words:
+    From the resume text below, extract the following fields:
+    - name
+    - skills (comma separated list)
+    - projects (with short description)
+    - technologies (comma separated list)
+    - certifications
+    - resume_text (original cleaned text)
 
-        1. Key technical skills
-        3. Major projects
-        4. Technologies / tools used
-        5. Certifications
+    Resume:
+    {resume}
 
-        Resume:
-        {resume}
+    Return strictly in the following JSON format:
+    {{
+        "name": "<full name>",
+        "skills": ["skill1", "skill2", "skill3"],
+        "projects": ["project1", "project2"],
+        "technologies": ["tech1", "tech2"],
+        "certifications": ["cert1", "cert2"],
+        "resume_text": "<cleaned text>"
+    }}
+    """
 
-        Return results as a **short clean paragraph**.
-        """
-    )
+    prompt = PromptTemplate(input_variables=["resume"], template=prompt_template)
+    chain = prompt | model
+    raw_output = chain.invoke({"resume": resume_text[:6000]})
 
-    chain = LLMChain(llm=model, prompt=prompt)
-    essential_text = chain.run({"resume": resume_text[:6000]})
+    # 3️⃣ Parse JSON safely using JsonOutputParser
+    parser = JsonOutputParser()
+    try:
+        metadata = parser.parse(raw_output.content)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to parse metadata: {raw_output.content} | Error: {str(e)}"
+        )
 
-    # 3️⃣ Convert to Embeddings
-    vector = embedding_model.embed_query(essential_text)
+    # 4️⃣ Create embedding
+    text_for_embedding = " ".join(metadata.get("skills", [])) + " " \
+                        + " ".join(metadata.get("projects", [])) + " " \
+                        + " ".join(metadata.get("technologies", []))
 
-    # 4️⃣ Store in DB
-    resume_vec = db.query(ResumeEmbedding).filter(ResumeEmbedding.studentId == dto.studentId).first()
+    vector = embedding_model.embed_query(text_for_embedding)
+
+    # 5️⃣ Store in DB
+    resume_vec = db.query(ResumeEmbedding).filter(
+        ResumeEmbedding.studentId == dto.studentId
+    ).first()
+
     if resume_vec:
-        resume_vec.embedding = bytes(vector)  # overwrite
+        resume_vec.resume_embedding = vector
+        resume_vec.resume_metadata = metadata
     else:
-        resume_vec = ResumeEmbedding(studentId=dto.studentId, embedding=bytes(vector))
+        resume_vec = ResumeEmbedding(
+            studentId=dto.studentId,
+            resume_embedding=vector,
+            resume_metadata=metadata
+        )
         db.add(resume_vec)
-    print("resume vector is stored")
+
     db.commit()
     db.refresh(resume_vec)
 
-    # return {"studentId": dto.studentId, "message": "Resume vector stored successfully"}
+    print("Saved metadata: ", json.dumps(metadata, indent=2))
+    print("All metadata stored successfully")
+
+    return JSONResponse(
+        content={
+            "status": "success",
+            "message": "Resume vector + metadata stored successfully",
+            "studentId": dto.studentId
+        },
+        status_code=200
+    )
